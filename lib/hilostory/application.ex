@@ -10,7 +10,6 @@ defmodule Hilostory.Application do
     children = [
       HilostoryWeb.Telemetry,
       Hilostory.Repo,
-      {DNSCluster, query: Application.get_env(:hilostory, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Hilostory.PubSub},
       # Start a worker by calling: Hilostory.Worker.start_link(arg)
       # {Hilostory.Worker, arg},
