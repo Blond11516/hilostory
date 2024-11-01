@@ -46,7 +46,8 @@ defmodule Hilostory.MixProject do
       {:telemetry_metrics, "1.0.0"},
       {:telemetry_poller, "1.1.0"},
       {:jason, "1.4.4"},
-      {:bandit, "1.5.7"}
+      {:bandit, "1.5.7"},
+      {:igniter, "0.3.76", only: :dev}
     ]
   end
 
