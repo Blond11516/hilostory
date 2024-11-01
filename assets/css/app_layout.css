@@ -1,0 +1,80 @@
+/*
+	Translation of the default app layout styles from Tailwind to native CSS.
+	This is very crude and should be cleaned up if/when the app layout is redesigned.
+*/
+
+:root {
+	--brand: #FD4F00;
+
+	font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+header {
+	padding-inline: 32px;
+
+	> div {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid rgb(244 244 245);
+		border-bottom-right-radius: 4px;
+		border-bottom-left-radius: 4px;
+		padding-block: 12px;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+
+		& div:nth-child(1) {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+			
+			& p {
+				background-color: color-mix(in srgb, var(--brand) 5%, transparent);
+				color: var(--brand);
+				border-radius: 9999px;
+				padding-inline: 8px;
+				font-weight: 500;
+				line-height: 1.5rem; /* 24px */
+			}
+		}
+
+		& div:nth-child(2) {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+			font-weight: 600;
+			line-height: 1.5rem; /* 24px */
+			color: rgb(24 24 27);
+
+			& a:hover {
+				color: rgb(63 63 70);
+			}
+
+			& a:last-child {
+				border-radius: 8px;
+				background-color: rgb(244 244 245);
+				padding-inline: 8px;
+				padding-block: 4px;
+			}
+
+			& a:last-child:hover {
+				color: rgb(228 228 231 0.8);
+			}
+		}
+	}
+}
+
+main {
+	padding-inline: 16px;
+	padding-block: 80px;
+
+	> div {
+		margin-inline: auto;
+		max-width: 672px;
+	}
+}

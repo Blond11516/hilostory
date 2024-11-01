@@ -17,7 +17,7 @@ defmodule HilostoryWeb.Router do
   scope "/", HilostoryWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", PageController
   end
 
   # Other scopes may use custom stacks.

@@ -1,9 +1,15 @@
 defmodule HilostoryWeb.PageController do
-  use HilostoryWeb, :controller
+  use HilostoryWeb, :live_view
 
-  def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home, layout: false)
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    Hello, World!
+    """
   end
 end
