@@ -1,4 +1,9 @@
 /*
+  This reset is heavily inspired by Josh W. Comeau's "Global Styles", provided through his "CSS for JS Devs" course.
+  https://courses.joshwcomeau.com/css-for-js/treasure-trove/010-global-styles
+*/
+
+/*
   1. Use a more-intuitive box-sizing model.
 */
 *, *::before, *::after {
