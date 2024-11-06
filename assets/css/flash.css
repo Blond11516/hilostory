@@ -1,0 +1,80 @@
+.flash {
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+	
+  position: fixed;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 50;
+  margin-right: 0.5rem;
+  width: 20rem;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+
+	&.info {
+		--tw-bg-opacity: 1;
+		background-color: rgb(236 253 245 / var(--tw-bg-opacity));
+		fill: #164e63;
+		--tw-text-opacity: 1;
+		color: rgb(6 95 70 / var(--tw-text-opacity));
+		--tw-ring-opacity: 1;
+		--tw-ring-color: rgb(16 185 129 / var(--tw-ring-opacity));
+	}
+
+	&.error {
+		--tw-bg-opacity: 1;
+		background-color: rgb(255 241 242 / var(--tw-bg-opacity));
+		fill: #881337;
+		--tw-text-opacity: 1;
+		color: rgb(136 19 55 / var(--tw-text-opacity));
+		--tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+		--tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+		box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+		--tw-ring-opacity: 1;
+		--tw-ring-color: rgb(244 63 94 / var(--tw-ring-opacity));
+	}
+
+	& > .title {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		line-height: 1.5rem;
+
+		& > *:first-child {
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	& > .message {
+		margin-top: 0.5rem;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+	}
+
+	& > button {
+		position: absolute;
+		top: 0.25rem;
+		right: 0.25rem;
+		padding: 0.5rem;
+		background-color: transparent;
+		border-width: 0px;
+
+		& > * {
+			height: 1.25rem;
+			width: 1.25rem;
+			opacity: 0.4;
+		}
+		
+		&:hover > * {
+			opacity: 0.7;
+		}
+	}
+}
