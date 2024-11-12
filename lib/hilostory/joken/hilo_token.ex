@@ -1,0 +1,13 @@
+defmodule Hilostory.Joken.HiloToken do
+  use Joken.Config
+
+  @expected_aud "1ca9f585-4a55-4085-8e30-9746a65fa561"
+
+  add_hook(JokenJwks, strategy: Hilostory.Joken.HiloStrategy)
+
+  @impl true
+  def token_config do
+    %{}
+    |> add_claim("aud", nil, fn aud -> aud == @expected_aud end)
+  end
+end

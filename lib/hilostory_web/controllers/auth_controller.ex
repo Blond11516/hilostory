@@ -1,6 +1,8 @@
 defmodule HilostoryWeb.AuthController do
   use HilostoryWeb, :controller
 
+  alias Hilostory.Joken.HiloToken
+
   @hilo_login_base_url "https://connexion.hiloenergie.com"
   @hilo_oauth_path "/hilodirectoryb2c.onmicrosoft.com/B2C_1A_SIGN_IN/oauth2/v2.0"
   @home_assistant_redirect_uri "https://my.home-assistant.io/redirect/oauth"
@@ -49,9 +51,12 @@ defmodule HilostoryWeb.AuthController do
     |> redirect(to: ~p"/login")
   end
 
-  defp verify_nonce(id_token, nonce) when is_binary(id_token) and is_binary(nonce) do
-    # TODO implement
-    :ok
+  defp verify_nonce(id_token, expected_nonce)
+       when is_binary(id_token) and is_binary(expected_nonce) do
+    with {:ok, %{"nonce" => nonce}} <- HiloToken.verify_and_validate(id_token),
+         ^expected_nonce <- nonce do
+      :ok
+    end
   end
 
   defp urlencode(binary) when is_binary(binary), do: Base.url_encode64(binary, padding: false)
