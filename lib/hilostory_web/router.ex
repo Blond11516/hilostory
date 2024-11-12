@@ -17,7 +17,15 @@ defmodule HilostoryWeb.Router do
   scope "/", HilostoryWeb do
     pipe_through :browser
 
-    live "/", PageController
+    live "/login", LoginLive
+  end
+
+  scope "/auth", HilostoryWeb do
+    get "/login", AuthController, :login
+
+    # This endpoint is dictated by my.home-assistant.io, which is authorized as
+    # a redirect URI by Hilo
+    get "/external/callback", AuthController, :callback
   end
 
   # Other scopes may use custom stacks.
