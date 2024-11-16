@@ -32,6 +32,7 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:cloak, "1.1.4"},
       {:joken_jwks, "1.6.0"},
       {:joken, "2.6.2"},
       {:req, "0.5.7"},

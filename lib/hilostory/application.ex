@@ -12,6 +12,7 @@ defmodule Hilostory.Application do
       Hilostory.Repo,
       {Phoenix.PubSub, name: Hilostory.PubSub},
       Hilostory.Joken.HiloStrategy,
+      Hilostory.Vault,
       # Start a worker by calling: Hilostory.Worker.start_link(arg)
       # {Hilostory.Worker, arg},
       # Start to serve requests, typically the last entry

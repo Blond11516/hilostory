@@ -1,0 +1,2 @@
+[env]
+HILO_TOKENS_ENCRYPTION_KEY = "32 |> :crypto.strong_rand_bytes() |> Base.encode64()"
