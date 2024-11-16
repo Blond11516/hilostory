@@ -2,6 +2,7 @@ defmodule HilostoryWeb.AuthController do
   use HilostoryWeb, :controller
 
   alias Hilostory.Joken.HiloToken
+  alias Hilostory.Infrastructure.OauthTokensRepository
 
   @hilo_login_base_url "https://connexion.hiloenergie.com"
   @hilo_oauth_path "/hilodirectoryb2c.onmicrosoft.com/B2C_1A_SIGN_IN/oauth2/v2.0"
@@ -37,13 +38,8 @@ defmodule HilostoryWeb.AuthController do
          ^persisted_state <- state,
          {:ok, {access_token, refresh_token, id_token}} =
            fetch_tokens(authorization_code, pkce_verifier),
-         :ok <- verify_nonce(id_token, nonce) do
-      IO.inspect(%{
-        access_token: access_token,
-        refresh_token: refresh_token,
-        id_token: id_token
-      })
-
+         :ok <- verify_nonce(id_token, nonce),
+         {:ok, _} <- OauthTokensRepository.upsert(access_token, refresh_token) do
       conn
     else
       e -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))

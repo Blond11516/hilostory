@@ -17,6 +17,7 @@ defmodule HilostoryWeb.Router do
   scope "/", HilostoryWeb do
     pipe_through :browser
 
+    live "/", HomeLive
     live "/login", LoginLive
   end
 

@@ -44,7 +44,9 @@ defmodule HilostoryWeb do
 
       import Plug.Conn
 
-      unquote(verified_routes())
+      require HilostoryWeb
+
+      HilostoryWeb.verified_routes()
     end
   end
 
@@ -88,12 +90,14 @@ defmodule HilostoryWeb do
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
+      require HilostoryWeb
+
       # Routes generation with the ~p sigil
-      unquote(verified_routes())
+      HilostoryWeb.verified_routes()
     end
   end
 
-  def verified_routes do
+  defmacro verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
         endpoint: HilostoryWeb.Endpoint,
