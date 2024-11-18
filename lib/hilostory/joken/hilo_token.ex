@@ -10,4 +10,8 @@ defmodule Hilostory.Joken.HiloToken do
     %{}
     |> add_claim("aud", nil, fn aud -> aud == @expected_aud end)
   end
+
+  def calculate_refresh_token_expiration(expires_in) when is_integer(expires_in) do
+    DateTime.add(DateTime.utc_now(), expires_in, :second)
+  end
 end

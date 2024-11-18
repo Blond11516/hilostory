@@ -10,6 +10,10 @@ defmodule HilostoryWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :hilo_auth do
+    plug HilostoryWeb.Plugs.HiloAuthenticated
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -17,11 +21,18 @@ defmodule HilostoryWeb.Router do
   scope "/", HilostoryWeb do
     pipe_through :browser
 
-    live "/", HomeLive
     live "/login", LoginLive
   end
 
+  scope "/", HilostoryWeb do
+    pipe_through [:browser, :hilo_auth]
+
+    live "/", HomeLive
+  end
+
   scope "/auth", HilostoryWeb do
+    pipe_through :api
+
     get "/login", AuthController, :login
 
     # This endpoint is dictated by my.home-assistant.io, which is authorized as

@@ -10,8 +10,9 @@ defmodule Hilostory.Application do
     children = [
       HilostoryWeb.Telemetry,
       Hilostory.Repo,
-      {Phoenix.PubSub, name: Hilostory.PubSub},
       Hilostory.Joken.HiloStrategy,
+      Hilostory.TokenRefreshScheduler,
+      {Phoenix.PubSub, name: Hilostory.PubSub},
       Hilostory.Vault,
       # Start a worker by calling: Hilostory.Worker.start_link(arg)
       # {Hilostory.Worker, arg},
