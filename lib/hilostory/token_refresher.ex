@@ -9,7 +9,6 @@ defmodule Hilostory.TokenRefresher do
          :ok <- verify_refresh_token_valid(tokens),
          {:ok, refreshed_tokens} <-
            HiloAuthorizationClient.refresh_access_token(tokens.refresh_token),
-         # TODO verify nonce
          refresh_token_expires_at =
            HiloToken.calculate_refresh_token_expiration(refreshed_tokens.refresh_token_expires_in),
          {:ok, tokens} <-

@@ -32,6 +32,7 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:websockex, "0.4.3"},
       {:cloak_ecto, "1.3.0"},
       {:cloak, "1.1.4"},
       {:joken_jwks, "1.6.0"},
