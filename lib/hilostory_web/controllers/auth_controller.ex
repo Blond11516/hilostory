@@ -3,7 +3,7 @@ defmodule HilostoryWeb.AuthController do
 
   alias Hilostory.Joken.HiloToken
   alias Hilostory.Infrastructure.OauthTokensRepository
-  alias Hilostory.Infrastructure.HiloAuthorizationClient
+  alias Hilostory.Infrastructure.Hilo.AuthorizationClient
 
   def login(conn, _params) do
     pkce_verifier = generate_pkce_verifier()
@@ -11,7 +11,7 @@ defmodule HilostoryWeb.AuthController do
     nonce = generate_nonce()
     state = generate_state()
 
-    authorization_uri = HiloAuthorizationClient.build_hilo_authorize_uri(state, pkce_code, nonce)
+    authorization_uri = AuthorizationClient.build_hilo_authorize_uri(state, pkce_code, nonce)
 
     conn
     |> fetch_session()
@@ -33,7 +33,7 @@ defmodule HilostoryWeb.AuthController do
          {conn, nonce} when is_binary(nonce) <- get_and_delete_session(conn, :nonce),
          ^persisted_state <- state,
          {:ok, tokens} =
-           HiloAuthorizationClient.fetch_access_token(authorization_code, pkce_verifier),
+           AuthorizationClient.fetch_access_token(authorization_code, pkce_verifier),
          :ok <- verify_nonce(tokens.id_token, nonce),
          refresh_token_expires_at =
            HiloToken.calculate_refresh_token_expiration(tokens.refresh_token_expires_in),

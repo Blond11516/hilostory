@@ -1,20 +1,23 @@
-defmodule Hilostory.Infrastructure.HiloWebsocketClient do
+defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   require Logger
 
   use WebSockex
 
   alias Hilostory.Signalr.Message
+  alias Hilostory.Infrastructure.Hilo.BaseApiClient
+  alias Hilostory.Infrastructure.Hilo.Models
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
 
   def start_link() do
-    {websocket_uri, websocket_access_token} = get_websocket_uri()
+    connection_info = get_websocket_connection_info()
 
     connection_id =
-      get_connection_id(websocket_uri, websocket_access_token)
+      get_connection_id(connection_info.url, connection_info.access_token)
 
     {:ok, websockex_pid} =
-      websocket_uri
+      connection_info.url
       |> URI.append_query(
-        URI.encode_query(%{"id" => connection_id, "access_token" => websocket_access_token})
+        URI.encode_query(%{"id" => connection_id, "access_token" => connection_info.access_token})
       )
       |> URI.to_string()
       |> WebSockex.start_link(__MODULE__, %{})
@@ -68,6 +71,11 @@ defmodule Hilostory.Infrastructure.HiloWebsocketClient do
     {:ok, state}
   end
 
+  @impl true
+  def terminate(_close_reason, _state) do
+    :ok
+  end
+
   defp get_connection_id(%URI{} = websocket_uri, websocket_access_token)
        when is_binary(websocket_access_token) do
     resp =
@@ -85,29 +93,21 @@ defmodule Hilostory.Infrastructure.HiloWebsocketClient do
     connection_id
   end
 
-  defp get_websocket_uri() do
+  defp get_websocket_connection_info() do
     access_token = Hilostory.Infrastructure.OauthTokensRepository.get().access_token
 
-    resp =
-      Req.new(
-        url: "https://api.hiloenergie.com/DeviceHub/negotiate",
-        auth: {:bearer, access_token},
-        headers: %{
-          "content-type" => "application/json; charset=utf-8",
-          "ocp-apim-subscription-key" => "20eeaedcb86945afa3fe792cea89b8bf"
-        },
-        body: ""
+    {:ok, resp} =
+      BaseApiClient.post(
+        "/DeviceHub",
+        "/negotiate",
+        access_token,
+        &Models.parse(
+          &1,
+          WebsocketConnectionInfo
+        )
       )
-      |> Req.post!()
 
-    %{
-      "accessToken" => access_token,
-      "availableTransports" => _available_transports,
-      "negotiateVersion" => _negotiate_version,
-      "url" => url
-    } = resp.body
-
-    {URI.parse(url), access_token}
+    resp.body
   end
 
   defp handle_message(%Message{type: :ping}) do

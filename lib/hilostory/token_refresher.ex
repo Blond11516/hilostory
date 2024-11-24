@@ -2,13 +2,13 @@ defmodule Hilostory.TokenRefresher do
   alias Hilostory.Joken.HiloToken
   alias Hilostory.Schema.OauthTokensSchema
   alias Hilostory.Infrastructure.OauthTokensRepository
-  alias Hilostory.Infrastructure.HiloAuthorizationClient
+  alias Hilostory.Infrastructure.Hilo.AuthorizationClient
 
   def refresh() do
     with %OauthTokensSchema{} = tokens <- get_tokens(),
          :ok <- verify_refresh_token_valid(tokens),
          {:ok, refreshed_tokens} <-
-           HiloAuthorizationClient.refresh_access_token(tokens.refresh_token),
+           AuthorizationClient.refresh_access_token(tokens.refresh_token),
          refresh_token_expires_at =
            HiloToken.calculate_refresh_token_expiration(refreshed_tokens.refresh_token_expires_in),
          {:ok, tokens} <-

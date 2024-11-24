@@ -1,4 +1,4 @@
-defmodule Hilostory.Infrastructure.HiloAuthorizationClient do
+defmodule Hilostory.Infrastructure.Hilo.AuthorizationClient do
   @hilo_login_base_url "https://connexion.hiloenergie.com"
   @hilo_oauth_path "/hilodirectoryb2c.onmicrosoft.com/B2C_1A_SIGN_IN/oauth2/v2.0"
   @home_assistant_redirect_uri "https://my.home-assistant.io/redirect/oauth"
