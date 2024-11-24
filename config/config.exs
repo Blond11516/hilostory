@@ -34,6 +34,7 @@ config :esbuild,
 
 # Configures Elixir's Logger
 config :logger, :console,
+  utc_log: true,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
