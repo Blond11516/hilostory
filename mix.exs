@@ -39,22 +39,22 @@ defmodule Hilostory.MixProject do
       {:joken_jwks, "1.6.0"},
       {:joken, "2.6.2"},
       {:req, "0.5.7"},
-      {:phoenix, "1.7.14"},
+      {:phoenix, "1.7.18"},
       {:phoenix_ecto, "4.6.3"},
       {:ecto_sql, "3.12.1"},
       {:postgrex, "0.19.3"},
       {:phoenix_html, "4.1.1"},
       {:phoenix_live_reload, "1.5.3", only: :dev},
-      # TODO bump on release to {:phoenix_live_view, "~> 1.0.0"},
-      {:phoenix_live_view, "1.0.0-rc.7", override: true},
-      {:floki, "0.36.3", only: :test},
+      {:phoenix_live_view, "1.0.0"},
+      {:floki, "0.37.0", only: :test},
       {:phoenix_live_dashboard, "0.8.5"},
       {:esbuild, "0.8.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "1.0.0"},
       {:telemetry_poller, "1.1.0"},
       {:jason, "1.4.4"},
-      {:bandit, "1.6.0"},
-      {:igniter, "0.4.7", only: :dev}
+      {:bandit, "1.6.1"},
+      {:igniter, "0.4.8", only: :dev},
+      {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false}
     ]
   end
 
