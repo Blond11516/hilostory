@@ -13,8 +13,24 @@ defmodule Hilostory.Signalr.Message do
   }
   @types_to_type_codes Map.new(@type_codes_to_types, fn {type_code, type} -> {type, type_code} end)
 
-  @enforce_keys [:type]
-  defstruct [:type]
+  @keys [:type, :target, :invocation_id, :arguments]
+  @enforce_keys @keys
+  defstruct @keys
+
+  @type t :: %__MODULE__{
+          type:
+            :invoke
+            | :stream
+            | :complete
+            | :stream_invocation
+            | :cancel_invocation
+            | :ping
+            | :close
+            | :unknown,
+          target: String.t() | nil,
+          invocation_id: String.t() | nil,
+          arguments: list()
+        }
 
   def from_websocket_frame(frame) do
     frame
@@ -35,7 +51,13 @@ defmodule Hilostory.Signalr.Message do
     with {:ok, message} <- Jason.decode(raw_message),
          {:ok, type_code} <- get_type_code(message),
          {:ok, type} <- get_type(type_code) do
-      {:ok, %__MODULE__{type: type}}
+      {:ok,
+       %__MODULE__{
+         type: type,
+         target: message["target"],
+         invocation_id: message["invocation_id"],
+         arguments: message["arguments"]
+       }}
     else
       {:error, reason} -> {:error, reason, raw_message}
     end
