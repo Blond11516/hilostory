@@ -1,0 +1,7 @@
+- figure out comment starter le client websocket et s'abonner à la location
+- extraire client signalr
+- créer les modèles de données pour les métriques
+- setuper la timeseries db
+- stocker les métriques après réception
+- être capable de query les données
+- visualiser les données
