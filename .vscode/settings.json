@@ -1,0 +1,9 @@
+{
+	"editor.rulers": [98, 120],
+  "[phoenix-heex]": {
+    "editor.defaultFormatter": "elixir-tools.elixir-tools"
+  },
+  "[elixir]": {
+    "editor.defaultFormatter": "elixir-tools.elixir-tools"
+  },
+}
