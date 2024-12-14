@@ -6,7 +6,7 @@
           <img src={~p"/images/logo.svg"} width="36" />
         </a>
         <p>
-          v<%= Application.spec(:phoenix, :vsn) %>
+          v{Application.spec(:phoenix, :vsn)}
         </p>
       </div>
       <div>
@@ -25,7 +25,7 @@
   <main>
     <div>
       <.flash_group flash={@flash} />
-      <%= @inner_content %>
+      {@inner_content}
     </div>
   </main>
 </div>
