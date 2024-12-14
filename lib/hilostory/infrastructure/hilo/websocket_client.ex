@@ -115,4 +115,10 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     Logger.debug("Received ping message. Will reply with pong.")
     WebSockex.cast(self(), :pong)
   end
+
+  defp handle_message(%Message{} = message) do
+    Logger.warning(
+      "Received unexpected message with type #{message.type}, target \"#{message.target}\" and invocation id \"#{message.invocation_id}\"."
+    )
+  end
 end
