@@ -7,6 +7,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.Infrastructure.Hilo.BaseApiClient
   alias Hilostory.Infrastructure.Hilo.Models
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
+  alias Hilostory.Infrastructure.Hilo.Models.Location
 
   def start_link() do
     connection_info = get_websocket_connection_info()
@@ -23,6 +24,19 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
       |> WebSockex.start_link(__MODULE__, %{})
 
     {:ok, websockex_pid}
+  end
+
+  def subscribe_to_location(client, %Location{} = location) do
+    WebSockex.send_frame(
+      client,
+      {:text,
+       Jason.encode!(%{
+         "arguments" => [location.id],
+         "invocationId" => "0",
+         "target" => "SubscribeToLocation",
+         "type" => 1
+       })}
+    )
   end
 
   @impl true
