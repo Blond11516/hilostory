@@ -103,7 +103,8 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
         access_token,
         &Models.parse(
           &1,
-          WebsocketConnectionInfo
+          WebsocketConnectionInfo,
+          %{url: fn raw_url -> URI.new!(raw_url) end}
         )
       )
 
