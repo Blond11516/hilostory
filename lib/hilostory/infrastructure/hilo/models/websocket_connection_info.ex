@@ -8,4 +8,11 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo do
 
   @enforce_keys @keys
   defstruct @keys
+
+  @type t :: %__MODULE__{
+          access_token: String.t(),
+          available_transports: List.t(),
+          negotiate_version: integer(),
+          url: URI.t()
+        }
 end

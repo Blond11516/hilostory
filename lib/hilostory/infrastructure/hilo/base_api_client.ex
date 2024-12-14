@@ -5,6 +5,12 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
 
   @subscription_key "20eeaedcb86945afa3fe792cea89b8bf"
 
+  @spec get(
+          nonempty_binary(),
+          nonempty_binary(),
+          nonempty_binary(),
+          (%{String.t() => term()} -> term())
+        ) :: {:error, term()} | {:ok, Req.Response.t()}
   def get(api_path_prefix, endpoint, access_token, parse_body)
       when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and
              is_function(parse_body) do
@@ -12,6 +18,12 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
     |> Req.get()
   end
 
+  @spec post(
+          nonempty_binary(),
+          nonempty_binary(),
+          nonempty_binary(),
+          (%{String.t() => term()} -> term())
+        ) :: {:error, term()} | {:ok, Req.Response.t()}
   def post(api_path_prefix, endpoint, access_token, parse_body)
       when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and
              is_function(parse_body) do
@@ -19,6 +31,12 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
     |> Req.post(body: "")
   end
 
+  @spec post(
+          nonempty_binary(),
+          nonempty_binary(),
+          nonempty_binary(),
+          (%{String.t() => term()} -> term())
+        ) :: Req.Request.t()
   defp prepare_request(api_path_prefix, endpoint, access_token, parse_body)
        when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and
               is_function(parse_body) do
@@ -48,6 +66,7 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
     )
   end
 
+  @spec get_uri(nonempty_binary(), nonempty_binary()) :: nonempty_binary()
   defp get_uri(api_path_prefix, endpoint) do
     @hilo_api_base_url
     |> URI.append_path(api_path_prefix)

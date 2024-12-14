@@ -16,4 +16,19 @@ defmodule Hilostory.Infrastructure.Hilo.Models.Location do
 
   @enforce_keys @keys
   defstruct @keys
+
+  @type t :: %__MODULE__{
+          address_id: String.t(),
+          country_code: String.t(),
+          created_utc: DateTime.t(),
+          energy_cost_configured: boolean(),
+          gateway_count: integer(),
+          id: integer(),
+          location_hilo_id: String.t(),
+          name: String.t(),
+          postal_code: String.t(),
+          temperature_format: String.t(),
+          time_format: String.t(),
+          time_zone: String.t()
+        }
 end

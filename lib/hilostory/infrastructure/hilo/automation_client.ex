@@ -8,6 +8,7 @@ defmodule Hilostory.Infrastructure.Hilo.AutomationClient do
 
   @path_prefix "/Automation/v1/api"
 
+  @spec list_devices(String.t(), integer()) :: {:error, term()} | {:ok, Req.Response.t()}
   def list_devices(access_token, location_id)
       when is_binary(access_token) and is_integer(location_id) do
     BaseApiClient.get(
@@ -27,6 +28,7 @@ defmodule Hilostory.Infrastructure.Hilo.AutomationClient do
     )
   end
 
+  @spec list_locations(String.t()) :: {:error, term()} | {:ok, Req.Response.t()}
   def list_locations(access_token) when is_binary(access_token) do
     BaseApiClient.get(
       @path_prefix,
