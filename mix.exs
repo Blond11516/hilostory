@@ -51,7 +51,6 @@ defmodule Hilostory.MixProject do
       {:esbuild, "0.8.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "1.0.0"},
       {:telemetry_poller, "1.1.0"},
-      {:jason, "1.4.4"},
       {:bandit, "1.6.1"},
       {:igniter, "0.4.8", only: :dev},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false}
