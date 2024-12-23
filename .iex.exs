@@ -21,3 +21,5 @@ import_if_available(IexHelpers)
 if Code.ensure_loaded?(IexAccessTokenStore) do
   IexAccessTokenStore.start_link()
 end
+
+IEx.configure(auto_reload: true)
