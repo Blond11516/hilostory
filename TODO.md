@@ -1,7 +1,9 @@
-- figure out comment starter le client websocket et s'abonner à la location
-- extraire client signalr
 - créer les modèles de données pour les métriques
 - setuper la timeseries db
 - stocker les métriques après réception
 - être capable de query les données
 - visualiser les données
+- extraire client signalr
+- starter le websocket après s'être authentifé
+- ne pas essayer de starter le websocket si le tokens ne sont pas valides
+  - obtenir le token par un process pour centraliser le fetching et la validation?
