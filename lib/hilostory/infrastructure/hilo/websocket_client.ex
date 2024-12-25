@@ -9,7 +9,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
   alias Hilostory.Infrastructure.Hilo.Models.Location
 
-  def start_link() do
+  def start_link(_) do
     connection_info = get_websocket_connection_info()
 
     connection_id =
