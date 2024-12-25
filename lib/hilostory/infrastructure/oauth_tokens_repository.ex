@@ -18,6 +18,7 @@ defmodule Hilostory.Infrastructure.OauthTokensRepository do
     end)
   end
 
+  @spec get() :: OauthTokensSchema.t() | nil
   def get() do
     Repo.one(OauthTokensSchema)
   end

@@ -3,6 +3,12 @@ defmodule Hilostory.Schema.OauthTokensSchema do
 
   alias Hilostory.Schema.EncryptedBinary
 
+  @type t :: %__MODULE__{
+          access_token: String.t(),
+          refresh_token: String.t(),
+          refresh_token_expires_at: DateTime.t()
+        }
+
   @primary_key false
 
   schema "oauth_tokens" do

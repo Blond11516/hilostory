@@ -9,8 +9,8 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
   alias Hilostory.Infrastructure.Hilo.Models.Location
 
-  def start_link(_) do
-    connection_info = get_websocket_connection_info()
+  def start_link(tokens) do
+    connection_info = get_websocket_connection_info(tokens)
 
     connection_id =
       get_connection_id(connection_info.url, connection_info.access_token)
@@ -107,8 +107,8 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     connection_id
   end
 
-  defp get_websocket_connection_info() do
-    access_token = Hilostory.Infrastructure.OauthTokensRepository.get().access_token
+  defp get_websocket_connection_info(tokens) do
+    access_token = tokens.access_token
 
     {:ok, resp} =
       BaseApiClient.post(
