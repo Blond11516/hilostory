@@ -33,6 +33,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   end
 
   def subscribe_to_location(client, %Location{} = location) do
+    Logger.info("Subscribing to location #{location.id}")
     WebSockex.cast(client, {:subscribe_to_location, location})
   end
 
