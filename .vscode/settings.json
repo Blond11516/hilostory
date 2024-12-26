@@ -1,9 +1,9 @@
 {
 	"editor.rulers": [98, 120],
   "[phoenix-heex]": {
-    "editor.defaultFormatter": "elixir-tools.elixir-tools"
+    "editor.defaultFormatter": "JakeBecker.elixir-ls"
   },
   "[elixir]": {
-    "editor.defaultFormatter": "elixir-tools.elixir-tools"
+    "editor.defaultFormatter": "JakeBecker.elixir-ls"
   },
 }
