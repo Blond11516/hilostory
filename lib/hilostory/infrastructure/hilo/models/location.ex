@@ -1,34 +1,18 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.Location do
-  @keys [
-    :address_id,
-    :country_code,
-    :created_utc,
-    :energy_cost_configured,
-    :gateway_count,
-    :id,
-    :location_hilo_id,
-    :name,
-    :postal_code,
-    :temperature_format,
-    :time_format,
-    :time_zone
-  ]
+  use TypedStruct
 
-  @enforce_keys @keys
-  defstruct @keys
-
-  @type t :: %__MODULE__{
-          address_id: String.t(),
-          country_code: String.t(),
-          created_utc: DateTime.t(),
-          energy_cost_configured: boolean(),
-          gateway_count: integer(),
-          id: integer(),
-          location_hilo_id: String.t(),
-          name: String.t(),
-          postal_code: String.t(),
-          temperature_format: String.t(),
-          time_format: String.t(),
-          time_zone: String.t()
-        }
+  typedstruct enforce: true do
+    field :address_id, String.t()
+    field :country_code, String.t()
+    field :created_utc, DateTime.t()
+    field :energy_cost_configured, boolean()
+    field :gateway_count, integer()
+    field :id, integer()
+    field :location_hilo_id, String.t()
+    field :name, String.t()
+    field :postal_code, String.t()
+    field :temperature_format, String.t()
+    field :time_format, String.t()
+    field :time_zone, String.t()
+  end
 end

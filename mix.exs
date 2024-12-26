@@ -32,6 +32,7 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:typed_struct, "0.3.0"},
       {:recase, "0.8.1"},
       {:websockex, "0.4.3"},
       {:cloak_ecto, "1.3.0"},

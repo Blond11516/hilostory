@@ -1,25 +1,14 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesReceived do
-  @keys [
-    :attribute,
-    :device_id,
-    :hilo_id,
-    :location_hilo_id,
-    :location_id,
-    :time_stamp_utc,
-    :value
-  ]
+  use TypedStruct
 
-  @enforce_keys @keys
-  defstruct @keys ++ [value_type: nil]
-
-  @type t :: %__MODULE__{
-          attribute: String.t(),
-          device_id: integer(),
-          hilo_id: String.t(),
-          location_hilo_id: String.t(),
-          location_id: integer(),
-          time_stamp_utc: DateTime.t(),
-          value: integer() | float() | String.t() | boolean() | list(),
-          value_type: String.t() | nil
-        }
+  typedstruct enforce: true do
+    field :attribute, String.t()
+    field :device_id, integer()
+    field :hilo_id, String.t()
+    field :location_hilo_id, String.t()
+    field :location_id, integer()
+    field :time_stamp_utc, DateTime.t()
+    field :value, integer() | float() | String.t() | boolean() | list()
+    field :value_type, String.t(), enforce: false
+  end
 end

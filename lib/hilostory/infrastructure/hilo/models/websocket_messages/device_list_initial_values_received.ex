@@ -1,39 +1,21 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived do
-  @keys [
-    :category,
-    :e_tag,
-    :external_group,
-    :hilo_id,
-    :id,
-    :identifier,
-    :is_favorite,
-    :model_number,
-    :name,
-    :provider,
-    :settable_attributes_list,
-    :supported_attributes_list,
-    :supported_parameters_list,
-    :type
-  ]
+  use TypedStruct
 
-  @enforce_keys @keys
-  defstruct @keys ++ [group_id: nil]
-
-  @type t :: %__MODULE__{
-          category: String.t(),
-          e_tag: String.t(),
-          external_group: String.t(),
-          group_id: integer() | nil,
-          hilo_id: String.t(),
-          id: integer(),
-          identifier: String.t(),
-          is_favorite: boolean(),
-          model_number: String.t(),
-          name: String.t(),
-          provider: integer(),
-          settable_attributes_list: list(String.t()),
-          supported_attributes_list: list(String.t()),
-          supported_parameters_list: list(String.t()),
-          type: String.t()
-        }
+  typedstruct enforce: true do
+    field :category, String.t()
+    field :e_tag, String.t()
+    field :external_group, String.t()
+    field :group_id, integer(), enforce: false
+    field :hilo_id, String.t()
+    field :id, integer()
+    field :identifier, String.t()
+    field :is_favorite, boolean()
+    field :model_number, String.t()
+    field :name, String.t()
+    field :provider, integer()
+    field :settable_attributes_list, list(String.t())
+    field :supported_attributes_list, list(String.t())
+    field :supported_parameters_list, list(String.t())
+    field :type, String.t()
+  end
 end
