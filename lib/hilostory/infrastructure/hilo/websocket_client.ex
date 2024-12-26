@@ -9,11 +9,16 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
   alias Hilostory.Infrastructure.Hilo.Models.Location
 
-  def start_link(tokens) do
+  def start_link({tokens, connected_callback}) do
+    Logger.info("Starting websocket client")
+
     connection_info = get_websocket_connection_info(tokens)
+    Logger.info("Fetched websocket connection info")
 
     connection_id =
       get_connection_id(connection_info.url, connection_info.access_token)
+
+    Logger.info("Fetched websocket connection id: #{connection_id}")
 
     {:ok, websockex_pid} =
       connection_info.url
@@ -21,28 +26,21 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
         URI.encode_query(%{"id" => connection_id, "access_token" => connection_info.access_token})
       )
       |> URI.to_string()
-      |> WebSockex.start_link(__MODULE__, %{})
+      |> WebSockex.start_link(__MODULE__, connected_callback)
 
+    Logger.info("Started websocket process")
     {:ok, websockex_pid}
   end
 
   def subscribe_to_location(client, %Location{} = location) do
-    WebSockex.send_frame(
-      client,
-      {:text,
-       Jason.encode!(%{
-         "arguments" => [location.id],
-         "invocationId" => "0",
-         "target" => "SubscribeToLocation",
-         "type" => 1
-       })}
-    )
+    WebSockex.cast(client, {:subscribe_to_location, location})
   end
 
   @impl true
   def handle_cast(:handshake, state) do
     handshake_frame = {:text, Jason.encode!(%{"protocol" => "json", "version" => 1}) <> "\u001e"}
     Logger.debug("Sending websocket handshake #{inspect(handshake_frame)}")
+    WebSockex.cast(self(), :run_connected_callback)
     {:reply, handshake_frame, state}
   end
 
@@ -51,8 +49,32 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     {:reply, {:text, Message.pong_frame()}, state}
   end
 
+  def handle_cast(:run_connected_callback, connected_callback) do
+    Logger.info("Running connected callback")
+    connected_callback.()
+    {:ok, connected_callback}
+  end
+
+  def handle_cast({:subscribe_to_location, location}, state) do
+    subsrciption_frame =
+      {:text,
+       Jason.encode!(%{
+         "arguments" => [location.id],
+         "invocationId" => "0",
+         "target" => "SubscribeToLocation",
+         "type" => 1
+       })}
+
+    Logger.debug(
+      "Sending websocket frame to subscribe to location #{location.id}: #{inspect(subsrciption_frame)}"
+    )
+
+    {:reply, subsrciption_frame, state}
+  end
+
   @impl true
   def handle_connect(_conn, state) do
+    Logger.info("Websocket connected, will send handshake")
     WebSockex.cast(self(), :handshake)
 
     {:ok, state}
@@ -60,8 +82,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
   @impl true
   def handle_disconnect(connection_status_map, state) do
-    IO.inspect("handle_disconnect")
-    dbg(connection_status_map)
+    Logger.info("Websocket disconnected: #{connection_status_map}")
 
     {:ok, state}
   end
@@ -86,7 +107,8 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   end
 
   @impl true
-  def terminate(_close_reason, _state) do
+  def terminate(close_reason, _state) do
+    Logger.info("Websocket client terminated: #{inspect(close_reason)}")
     :ok
   end
 

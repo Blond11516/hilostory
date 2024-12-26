@@ -1,4 +1,9 @@
 defmodule Hilostory.WebsocketStarter do
+  alias Hilostory.WebsocketSuperviser
+  alias Hilostory.Infrastructure.Hilo.AutomationClient
+  alias Hilostory.Infrastructure.OauthTokensRepository
+  alias Hilostory.Schema.OauthTokensSchema
+
   use Task
 
   require Logger
@@ -8,13 +13,14 @@ defmodule Hilostory.WebsocketStarter do
   end
 
   def start_websocket() do
-    case Hilostory.Infrastructure.OauthTokensRepository.get() do
-      nil ->
-        Logger.info("Did not find Hilo credentials, will not start websocket.")
+    Logger.info("Will attempt to start websocket.")
 
-      tokens ->
-        Logger.info("Found Hilo credentials, starting websocket")
-        Hilostory.WebsocketSuperviser.start_websocket(tokens)
+    with %OauthTokensSchema{} = tokens <- OauthTokensRepository.get(),
+         {:ok, %{body: [location]}} <- AutomationClient.list_locations(tokens.access_token) do
+      Logger.info("Found Hilo credentials and fetched location, starting websocket")
+      WebsocketSuperviser.start_websocket(tokens, location)
+    else
+      error -> Logger.info("Failed to start websocket: #{inspect(error)}")
     end
   end
 end
