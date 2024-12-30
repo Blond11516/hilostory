@@ -1,4 +1,5 @@
 defmodule Hilostory.Infrastructure.Hilo.Models do
+  @spec parse(%{String.t() => any()}, module(), %{atom() => (any() -> any())}) :: struct()
   def parse(data, model_module, field_parsers \\ %{})
 
   def parse(datum, model_module, field_parsers)

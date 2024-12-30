@@ -7,3 +7,4 @@
 - starter le websocket après s'être authentifé
 - ne pas essayer de starter le websocket si le tokens ne sont pas valides
   - obtenir le token par un process pour centraliser le fetching et la validation?
+- vérifier le type de message envoyé lors d'un rename de device

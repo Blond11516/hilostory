@@ -3,6 +3,9 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
   use WebSockex
 
+  alias Hilostory.Infrastructure.DeviceRepository
+  alias Hilostory.Device
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived
   alias Hilostory.Signalr.Message
   alias Hilostory.Infrastructure.Hilo.BaseApiClient
   alias Hilostory.Infrastructure.Hilo.Models
@@ -151,6 +154,40 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   defp handle_message(%Message{type: :ping}) do
     Logger.debug("Received ping message. Will reply with pong.")
     WebSockex.cast(self(), :pong)
+  end
+
+  defp handle_message(
+         %Message{type: :invoke, target: "DeviceListInitialValuesReceived"} = message
+       ) do
+    Logger.info("Handling \"DeviceListInitialValuesReceived\". Persisting devices in task.")
+
+    Task.start(fn ->
+      Logger.info("Persisting devices.")
+
+      message.arguments
+      |> hd()
+      |> Models.parse(DeviceListInitialValuesReceived)
+      |> Enum.each(fn %DeviceListInitialValuesReceived{} = device ->
+        device = %Device{
+          id: device.id,
+          hilo_id: device.hilo_id,
+          name: device.name,
+          type: device.type
+        }
+
+        upsert_result = DeviceRepository.upsert(device)
+
+        case upsert_result do
+          {:ok, _} ->
+            Logger.info("Successfully persisted device #{device.id}")
+
+          {:error, error} ->
+            Logger.error("Failed to persist device #{device.id}: #{inspect(error)}")
+        end
+      end)
+
+      Logger.info("Finished persisting devices, task will end.")
+    end)
   end
 
   defp handle_message(%Message{} = message) do
