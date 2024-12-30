@@ -3,6 +3,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
   use WebSockex
 
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Device
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived
@@ -162,7 +163,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     Logger.info("Handling \"DeviceListInitialValuesReceived\". Persisting devices in task.")
 
     Task.start(fn ->
-      Logger.info("Persisting devices.")
+      Logger.info("Persisting initial devices list.")
 
       message.arguments
       |> hd()
@@ -175,9 +176,9 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
           type: device.type
         }
 
-        upsert_result = DeviceRepository.upsert(device)
-
-        case upsert_result do
+        device
+        |> DeviceRepository.upsert()
+        |> case do
           {:ok, _} ->
             Logger.info("Successfully persisted device #{device.id}")
 
@@ -187,6 +188,32 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
       end)
 
       Logger.info("Finished persisting devices, task will end.")
+    end)
+  end
+
+  defp handle_message(
+         %Message{type: :invoke, target: "DeviceListUpdatedValuesReceived"} = message
+       ) do
+    Logger.info("Handling \"DeviceListUpdatedValuesReceived\". Persisting devices in task.")
+
+    Task.start(fn ->
+      Logger.info("Persisting updated devices.")
+
+      message.arguments
+      |> hd()
+      |> Models.parse(DeviceListUpdatedValuesReceived)
+      |> Enum.each(fn %DeviceListUpdatedValuesReceived{} = device ->
+        DeviceRepository.update(device.id, device.name)
+        |> case do
+          {:ok, _} ->
+            Logger.info("Successfully updated device #{device.id}")
+
+          {:error, error} ->
+            Logger.error("Failed to update device #{device.id}: #{inspect(error)}")
+        end
+      end)
+
+      Logger.info("Finished updating devices, task will end.")
     end)
   end
 
