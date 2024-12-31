@@ -37,7 +37,7 @@ defmodule Hilostory.TokenRefreshScheduler do
     {:noreply, state}
   end
 
-  defp start_loop() do
+  def start_loop() do
     case TokenRefresher.calculate_time_until_refresh() do
       {:ok, refresh_in} ->
         Logger.info(
@@ -45,14 +45,17 @@ defmodule Hilostory.TokenRefreshScheduler do
         )
 
         schedule_refresh(refresh_in)
+        :ok
 
       {:error, :no_signers_fetched} ->
         Logger.info("JWKS not yet fetched. Will try starting refresh loop again in 2 seconds.")
         Process.sleep(2_000)
         start_loop()
+        :ok
 
       error ->
         Logger.error("Failed to start access token refresh loop: #{inspect(error)}")
+        {:error, error}
     end
   end
 

@@ -1,6 +1,8 @@
 defmodule HilostoryWeb.AuthController do
   use HilostoryWeb, :controller
 
+  alias Hilostory.TokenRefreshScheduler
+  alias Hilostory.WebsocketStarter
   alias Hilostory.Joken.HiloToken
   alias Hilostory.Infrastructure.OauthTokensRepository
   alias Hilostory.Infrastructure.Hilo.AuthorizationClient
@@ -42,9 +44,12 @@ defmodule HilostoryWeb.AuthController do
              tokens.access_token,
              tokens.refresh_token,
              refresh_token_expires_at
-           ) do
+           ),
+         {:ok, _} <- WebsocketStarter.start_websocket(),
+         :ok <- TokenRefreshScheduler.start_loop() do
       conn
     else
+      {:error, e} -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))
       e -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))
     end
     |> redirect(to: ~p"/login")
