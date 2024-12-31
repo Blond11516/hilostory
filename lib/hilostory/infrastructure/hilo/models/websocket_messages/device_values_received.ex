@@ -10,5 +10,6 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesRec
     field :time_stamp_utc, DateTime.t()
     field :value, integer() | float() | String.t() | boolean() | list()
     field :value_type, String.t(), enforce: false
+    field :operation_id, String.t(), enforce: false
   end
 end

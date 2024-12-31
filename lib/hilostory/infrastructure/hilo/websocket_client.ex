@@ -3,6 +3,16 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
   use WebSockex
 
+  alias Hilostory.Infrastructure.DeviceValueRepository
+  alias Hilostory.DeviceValue.DrmsState
+  alias Hilostory.DeviceValue.GdState
+  alias Hilostory.DeviceValue.Power
+  alias Hilostory.DeviceValue.Heating
+  alias Hilostory.DeviceValue.TargetTemperature
+  alias Hilostory.DeviceValue.Temperature
+  alias Hilostory.DeviceValue.PairingState
+  alias Hilostory.DeviceValue.ConnectionState
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesReceived
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Device
@@ -214,6 +224,94 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
       end)
 
       Logger.info("Finished updating devices, task will end.")
+    end)
+  end
+
+  defp handle_message(%Message{type: :invoke, target: "DevicesValuesReceived"} = message) do
+    Logger.info("Handling \"DevicesValuesReceived\". Persiting values in task.")
+
+    Task.start(fn ->
+      Logger.info("Persisting device values.")
+
+      message.arguments
+      |> hd()
+      |> Models.parse(DeviceValuesReceived, %{
+        time_stamp_utc: fn iso_date_time ->
+          {:ok, date_time, 0} = DateTime.from_iso8601(iso_date_time)
+          date_time
+        end
+      })
+      |> Enum.each(fn value ->
+        parsed_value =
+          case value.attribute do
+            "Disconnected" ->
+              %ConnectionState{
+                connected?: !value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "Unpaired" ->
+              %PairingState{
+                paired?: !value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "CurrentTemperature" ->
+              %Temperature{
+                temperature: value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "TargetTemperature" ->
+              %TargetTemperature{
+                target_temperature: value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "Heating" ->
+              %Heating{
+                heating: value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "Power" ->
+              %Power{
+                power: value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "GdState" ->
+              %GdState{
+                state: value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            "DrmsState" ->
+              %DrmsState{
+                state: value.value,
+                timestamp: value.time_stamp_utc
+              }
+
+            _ ->
+              :untracked_value
+          end
+
+        if parsed_value != :untracked_value do
+          parsed_value
+          |> DeviceValueRepository.insert(value.device_id)
+          |> case do
+            {:ok, _} ->
+              Logger.info(
+                "Successfully inserted value #{value.value} for attribute #{value.attribute} of device #{value.device_id} at time #{value.time_stamp_utc}."
+              )
+
+            {:error, error} ->
+              Logger.error(
+                "Failed to insert value #{value.value} for attribute #{value.attribute} of device #{value.device_id} at time #{value.time_stamp_utc}: #{inspect(error)}"
+              )
+          end
+        end
+      end)
     end)
   end
 

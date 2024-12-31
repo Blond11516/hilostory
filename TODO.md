@@ -1,10 +1,7 @@
-- créer les modèles de données pour les métriques
-- setuper la timeseries db
-- stocker les métriques après réception
 - être capable de query les données
 - visualiser les données
 - extraire client signalr
 - starter le websocket après s'être authentifé
+- starter la loop de refesh de token après s'être authentifié
 - ne pas essayer de starter le websocket si le tokens ne sont pas valides
   - obtenir le token par un process pour centraliser le fetching et la validation?
-- vérifier le type de message envoyé lors d'un rename de device
