@@ -1,7 +1,10 @@
 - être capable de query les données
 - visualiser les données
+- protéger l'interface web avec un mot de passe
 - extraire client signalr
 - starter le websocket après s'être authentifé
 - starter la loop de refesh de token après s'être authentifié
 - ne pas essayer de starter le websocket si le tokens ne sont pas valides
   - obtenir le token par un process pour centraliser le fetching et la validation?
+- gérer les messages avec type "complete"
+- gérer les messages avec target "GatewayValuesReceived"
