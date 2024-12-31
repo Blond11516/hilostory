@@ -1,8 +1,12 @@
 defmodule Hilostory.Vault do
   use Cloak.Vault, otp_app: :hilostory
 
+  require Logger
+
   @impl GenServer
   def init(config) do
+    Logger.info("Initializing Cloak vault")
+
     config =
       Keyword.put(config, :ciphers,
         default: {
