@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: timescale/timescaledb-ha:pg17
+    image: timescale/timescaledb-ha:pg16
     ports:
       - 5432:5432
     environment:
