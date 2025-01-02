@@ -20,15 +20,69 @@ import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
-import topbar from "../vendor/topbar"
+import topbar from "topbar"
+import uPlot from "uplot"
 
 // Import app.css so it is bundled by esbuild
 import "../css/app.css"
+import "uplot/dist/uPlot.min.css"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: {
+    Chart: {
+      mounted() {
+        const powerData = JSON.parse(this.el.getAttribute("data-data"))
+        const sortedPowerData = Object.entries(powerData).toSorted((a, b) => a[0] - b[0])
+        const timestamps = sortedPowerData.map(it => Number.parseInt(it[0]))
+        const powers = sortedPowerData.map(it => it[1].power)
+        const temperatures = sortedPowerData.map(it => it[1].temperature)
+        const targetTemperatures = sortedPowerData.map(it => it[1].targetTemperature)
+        let data = [
+          timestamps,
+          powers,
+          temperatures,
+          targetTemperatures
+        ];
+        let opts = {
+          title: "Power",
+          width: 800,
+          height: 400,
+          series: [
+            {},
+            {
+              show: true,
+              spanGaps: false,
+              label: "Power",
+              value: (self, rawValue) => rawValue ? rawValue.toFixed(2) + " W" : '',
+              stroke: "red",
+              width: 1,
+            },
+            {
+              show: true,
+              spanGaps: false,
+              label: "Temperature",
+              value: (self, rawValue) => rawValue ? rawValue.toFixed(2) + " C" : '',
+              stroke: "green",
+              width: 1,
+            },
+            {
+              show: true,
+              spanGaps: false,
+              label: "Target temperature",
+              value: (self, rawValue) => rawValue ? rawValue.toFixed(2) + " C" : '',
+              stroke: "blue",
+              width: 1,
+            }
+          ],
+        };
+        
+        new uPlot(opts, data, this.el);
+      }
+    }
+  }
 })
 
 // Show progress bar on live navigation and form submits

@@ -18,6 +18,8 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
   alias Hilostory.Repo
   alias Ecto.Changeset
 
+  import Ecto.Query, only: [from: 2]
+
   def insert(value, device_id)
       when is_integer(device_id) and
              (is_struct(value, ConnectionState) or
@@ -63,5 +65,63 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
       :device_id
     ])
     |> Repo.insert()
+  end
+
+  def fetch(value)
+      when value in [
+             ConnectionState,
+             PairingState,
+             Temperature,
+             TargetTemperature,
+             Heating,
+             Power,
+             GdState,
+             DrmsState
+           ] do
+    value_schema =
+      case value do
+        ConnectionState -> ConnectionStateSchema
+        PairingState -> PairingStateSchema
+        Temperature -> TemperatureSchema
+        TargetTemperature -> TargetTemperatureSchema
+        Heating -> HeatingSchema
+        Power -> PowerSchema
+        GdState -> GdStateSchema
+        DrmsState -> DrmsStateSchema
+      end
+
+    Repo.all(
+      from v in value_schema,
+        where: v.device_id == 949_020,
+        select: v
+    )
+    |> Enum.map(fn
+      %ConnectionStateSchema{} = value ->
+        %ConnectionState{timestamp: value.timestamp, connected?: value.connected}
+
+      %PairingStateSchema{} = value ->
+        %PairingState{timestamp: value.timestamp, paired?: value.paired}
+
+      %TemperatureSchema{} = value ->
+        %Temperature{timestamp: value.timestamp, temperature: value.temperature}
+
+      %TargetTemperatureSchema{} = value ->
+        %TargetTemperature{
+          timestamp: value.timestamp,
+          target_temperature: value.target_temperature
+        }
+
+      %HeatingSchema{} = value ->
+        %Heating{timestamp: value.timestamp, heating: value.heating}
+
+      %PowerSchema{} = value ->
+        %Power{timestamp: value.timestamp, power: value.power}
+
+      %GdStateSchema{} = value ->
+        %GdState{timestamp: value.timestamp, state: value.state}
+
+      %DrmsStateSchema{} = value ->
+        %DrmsState{timestamp: value.timestamp, state: value.state}
+    end)
   end
 end

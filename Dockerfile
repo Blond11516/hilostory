@@ -14,6 +14,7 @@
 ARG ELIXIR_VERSION=1.18.1
 ARG OTP_VERSION=27.2
 ARG DEBIAN_VERSION=bullseye-20241223-slim
+ARG BUN_VERSION=1.1.42
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
@@ -30,6 +31,17 @@ WORKDIR /app
 # install hex + rebar
 RUN mix local.hex --force && \
   mix local.rebar --force
+
+ARG BUN_VERSION
+
+# install bun
+RUN apt-get update && apt-get install -y curl unzip && apt-get clean && rm -f /var/lib/apt/lists/*_* && \
+  curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v${BUN_VERSION}"
+
+# install node modules
+RUN mkdir assets
+COPY assets/package.json assets/bun.lockb assets/
+RUN cd assets && bun install --production --frozen-lockfile
 
 # set build ENV
 ENV MIX_ENV="prod"
