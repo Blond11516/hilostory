@@ -1,6 +1,6 @@
 {
   "name": "hilostory",
-  "module": "app.js",
+  "module": "app.ts",
   "type": "module",
   "dependencies": {
     "topbar": "3.0.0",
