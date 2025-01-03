@@ -1,5 +1,3 @@
-- être capable de query les données
-- visualiser les données
 - protéger l'interface web avec un mot de passe
 - extraire client signalr
 - ne pas essayer de starter le websocket si le tokens ne sont pas valides
