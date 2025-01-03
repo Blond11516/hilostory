@@ -56,27 +56,43 @@ let liveSocket = new LiveSocket("/live", Socket, {
               show: true,
               spanGaps: false,
               label: "Power",
-              value: (self, rawValue) => rawValue ? rawValue.toFixed(2) + " W" : '',
+              value: (self, rawValue) => rawValue !== null ? rawValue + " W" : '',
               stroke: "red",
               width: 1,
+              scale: "watts"
             },
             {
               show: true,
               spanGaps: false,
               label: "Temperature",
-              value: (self, rawValue) => rawValue ? rawValue.toFixed(2) + " C" : '',
+              value: (self, rawValue) => rawValue !== null ? rawValue.toFixed(1) + " C" : '',
               stroke: "green",
               width: 1,
+              scale: "degrees celcius"
             },
             {
               show: true,
               spanGaps: false,
               label: "Target temperature",
-              value: (self, rawValue) => rawValue ? rawValue.toFixed(2) + " C" : '',
+              value: (self, rawValue) => rawValue !== null ? rawValue.toFixed(1) + " C" : '',
               stroke: "blue",
               width: 1,
+              scale: "degrees celcius"
             }
           ],
+          axes: [
+            {},
+            {
+              scale: "watts",
+              values: (self, ticks) => ticks.map(it => it + ' W')
+            },
+            {
+              scale: 'degrees celcius',
+              side: 1,
+              grid: { show: false },
+              values: (self, ticks) => ticks.map(it => it + ' C')
+            }
+          ]
         };
         
         new uPlot(opts, data, this.el);
