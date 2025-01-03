@@ -1,4 +1,5 @@
 defmodule HilostoryWeb.HomeLive do
+  alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.DeviceValue.TargetTemperature
   alias Hilostory.DeviceValue.Temperature
   alias Hilostory.DeviceValue.Power
@@ -17,21 +18,38 @@ defmodule HilostoryWeb.HomeLive do
     <.async_result :let={data} assign={@data}>
       <:loading>Loading data</:loading>
       <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
-      <div id="chart" phx-hook="Chart" data-data={data} />
+
+      <div class="chart-grid">
+        <div
+          :for={{device, device_data} <- data}
+          id="chart"
+          phx-hook="Chart"
+          data-device-name={device.name}
+          data-data={device_data}
+        />
+      </div>
     </.async_result>
     """
   end
 
   defp fetch_data() do
+    device_data =
+      DeviceRepository.all()
+      |> Map.new(fn device -> {device, fetch_device_data(device.id)} end)
+
+    {:ok, %{data: device_data}}
+  end
+
+  defp fetch_device_data(device_id) do
     power_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(Power)
+        DeviceValueRepository.fetch(Power, device_id)
         |> Map.new(fn %Power{} = value -> {DateTime.to_unix(value.timestamp), value.power} end)
       end)
 
     temperature_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(Temperature)
+        DeviceValueRepository.fetch(Temperature, device_id)
         |> Map.new(fn %Temperature{} = value ->
           {DateTime.to_unix(value.timestamp), value.temperature}
         end)
@@ -39,7 +57,7 @@ defmodule HilostoryWeb.HomeLive do
 
     target_temperature_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(TargetTemperature)
+        DeviceValueRepository.fetch(TargetTemperature, device_id)
         |> Map.new(fn %TargetTemperature{} = value ->
           {DateTime.to_unix(value.timestamp), value.target_temperature}
         end)
@@ -63,18 +81,15 @@ defmodule HilostoryWeb.HomeLive do
       |> MapSet.union(temperature_timestamps)
       |> MapSet.union(target_temperature_timestamps)
 
-    data =
-      all_timestamps
-      |> Map.new(fn timestamp ->
-        {timestamp,
-         %{
-           "power" => power_values[timestamp],
-           "temperature" => temperature_values[timestamp],
-           "targetTemperature" => target_temperature_values[timestamp]
-         }}
-      end)
-      |> JSON.encode!()
-
-    {:ok, %{data: data}}
+    all_timestamps
+    |> Map.new(fn timestamp ->
+      {timestamp,
+       %{
+         "power" => power_values[timestamp],
+         "temperature" => temperature_values[timestamp],
+         "targetTemperature" => target_temperature_values[timestamp]
+       }}
+    end)
+    |> JSON.encode!()
   end
 end

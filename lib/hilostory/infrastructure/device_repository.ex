@@ -17,4 +17,8 @@ defmodule Hilostory.Infrastructure.DeviceRepository do
     |> Changeset.cast(%{name: name}, [:name])
     |> Repo.update()
   end
+
+  def all() do
+    Repo.all(DeviceSchema)
+  end
 end

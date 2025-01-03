@@ -20,6 +20,16 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
 
   import Ecto.Query, only: [from: 2]
 
+  @typep value_module ::
+           ConnectionState
+           | PairingState
+           | Temperature
+           | TargetTemperature
+           | Heating
+           | Power
+           | GdState
+           | DrmsState
+
   def insert(value, device_id)
       when is_integer(device_id) and
              (is_struct(value, ConnectionState) or
@@ -67,7 +77,8 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
     |> Repo.insert()
   end
 
-  def fetch(value)
+  @spec fetch(value_module(), integer()) :: struct()
+  def fetch(value, device_id)
       when value in [
              ConnectionState,
              PairingState,
@@ -92,7 +103,7 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
 
     Repo.all(
       from v in value_schema,
-        where: v.device_id == 949_020,
+        where: v.device_id == ^device_id,
         select: v
     )
     |> Enum.map(fn

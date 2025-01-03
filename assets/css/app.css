@@ -1,3 +1,8 @@
 @import "./reset.css";
 @import "./app_layout.css";
 @import "./flash.css";
+
+.chart-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}

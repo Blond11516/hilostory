@@ -34,6 +34,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
   hooks: {
     Chart: {
       mounted() {
+        const deviceName = this.el.getAttribute("data-device-name")
         const powerData = JSON.parse(this.el.getAttribute("data-data"))
         const sortedPowerData = Object.entries(powerData).toSorted((a, b) => a[0] - b[0])
         const timestamps = sortedPowerData.map(it => Number.parseInt(it[0]))
@@ -47,8 +48,8 @@ let liveSocket = new LiveSocket("/live", Socket, {
           targetTemperatures
         ];
         let opts = {
-          title: "Power",
-          width: 800,
+          title: deviceName,
+          width: this.el.offsetWidth,
           height: 400,
           series: [
             {},
