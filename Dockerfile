@@ -13,17 +13,16 @@
 #
 ARG ELIXIR_VERSION=1.18.1
 ARG OTP_VERSION=27.2
-ARG DEBIAN_VERSION=bullseye-20241223-slim
+ARG ALPINE_VERSION=3.21.0
 ARG BUN_VERSION=1.1.42
 
-ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
-ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
+ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-alpine-${ALPINE_VERSION}"
+ARG RUNNER_IMAGE="alpine:${ALPINE_VERSION}"
 
-FROM ${BUILDER_IMAGE} as builder
+FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git \
-  && apt-get clean && rm -f /var/lib/apt/lists/*_*
+RUN apk update && apk add build-base git
 
 # prepare build dir
 WORKDIR /app
@@ -35,7 +34,7 @@ RUN mix local.hex --force && \
 ARG BUN_VERSION
 
 # install bun
-RUN apt-get update && apt-get install -y curl unzip && apt-get clean && rm -f /var/lib/apt/lists/*_* && \
+RUN apk update && apk add curl unzip bash && \
   curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v${BUN_VERSION}"
 
 # install node modules
@@ -79,16 +78,7 @@ RUN mix release
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
-RUN apt-get update -y && \
-  apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates \
-  && apt-get clean && rm -f /var/lib/apt/lists/*_*
-
-# Set the locale
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+RUN apk update && apk add libstdc++ openssl ncurses ca-certificates
 
 WORKDIR "/app"
 RUN chown nobody /app
