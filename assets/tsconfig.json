@@ -1,0 +1,34 @@
+{
+  /*
+    These options are copied and adapted from https://www.totaltypescript.com/tsconfig-cheat-sheet
+    They should be reviewed and updated from time to time.
+  */
+  
+  "compilerOptions": {
+    /* Base Options: */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    /* If NOT transpiling with TypeScript: */
+    "module": "preserve",
+    "noEmit": true,
+
+    /* If your code runs in the DOM: */
+    /* 
+      This is overriding the proposed value of ["es2022", "dom", "dom.iterable"] to allow using
+      Array.toSorted among other things.
+    */
+    "lib": ["es2023", "dom", "dom.iterable"],
+  }
+}

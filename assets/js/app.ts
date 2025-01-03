@@ -27,7 +27,15 @@ import uPlot from "uplot"
 import "../css/app.css"
 import "uplot/dist/uPlot.min.css"
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+type DeviceDataPoint = {
+  power: number | null
+  temperature: number | null
+  targetTemperature: number | null
+}
+
+type DeviceData = Record<number, DeviceDataPoint>
+
+let csrfToken = document.querySelector("meta[name='csrf-token']")!.getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
@@ -35,19 +43,19 @@ let liveSocket = new LiveSocket("/live", Socket, {
     Chart: {
       mounted() {
         const deviceName = this.el.getAttribute("data-device-name")
-        const powerData = JSON.parse(this.el.getAttribute("data-data"))
-        const sortedPowerData = Object.entries(powerData).toSorted((a, b) => a[0] - b[0])
+        const powerData = JSON.parse(this.el.getAttribute("data-data")) as DeviceData
+        const sortedPowerData = Object.entries(powerData).toSorted((a, b) => Number.parseInt(a[0]) - Number.parseInt(b[0]))
         const timestamps = sortedPowerData.map(it => Number.parseInt(it[0]))
         const powers = sortedPowerData.map(it => it[1].power)
         const temperatures = sortedPowerData.map(it => it[1].temperature)
         const targetTemperatures = sortedPowerData.map(it => it[1].targetTemperature)
-        let data = [
+        const data: [number[], ...(number | null)[][]] = [
           timestamps,
           powers,
           temperatures,
           targetTemperatures
         ];
-        let opts = {
+        const opts: uPlot.Options = {
           title: deviceName,
           width: this.el.offsetWidth,
           height: 400,

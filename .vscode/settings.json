@@ -6,4 +6,6 @@
   "[elixir]": {
     "editor.defaultFormatter": "JakeBecker.elixir-ls"
   },
+  "typescript.tsdk": "./assets/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
