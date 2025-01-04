@@ -22,7 +22,7 @@ defmodule HilostoryWeb.HomeLive do
       <div class="chart-grid">
         <div
           :for={{device, device_data} <- data}
-          id="chart"
+          id={"chart-#{device.name}"}
           phx-hook="Chart"
           data-device-name={device.name}
           data-data={device_data}

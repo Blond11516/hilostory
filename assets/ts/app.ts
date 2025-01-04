@@ -35,6 +35,9 @@ type DeviceDataPoint = {
 
 type DeviceData = Record<number, DeviceDataPoint>
 
+const sync = uPlot.sync("chartsSync")
+const charts: Record<string, uPlot> = {}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']")!.getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
@@ -101,11 +104,29 @@ let liveSocket = new LiveSocket("/live", Socket, {
               grid: { show: false },
               values: (self, ticks) => ticks.map(it => it + ' C')
             }
-          ]
+          ],
+          cursor: {
+            sync: {
+              key: sync.key,
+              setSeries: true,
+            }
+          }
         };
         
-        new uPlot(opts, data, this.el);
-      }
+        const plot = new uPlot(opts, data, this.el);
+        charts[deviceName] = plot
+        sync.sub(plot)
+        console.log(sync)
+      },
+      destroyed() {
+        const deviceName = this.el.getAttribute("data-device-name")
+        const plot = charts[deviceName]
+
+        if (plot) {
+          sync.unsub(plot)
+          delete charts[deviceName]
+        }
+      },
     }
   }
 })
