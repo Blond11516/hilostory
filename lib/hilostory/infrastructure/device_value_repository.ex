@@ -101,9 +101,13 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
         DrmsState -> DrmsStateSchema
       end
 
+    now_minus_24_hours = DateTime.utc_now() |> DateTime.add(-24, :hour)
+
     Repo.all(
       from v in value_schema,
-        where: v.device_id == ^device_id,
+        where:
+          v.device_id == ^device_id and
+            v.timestamp > ^now_minus_24_hours,
         select: v
     )
     |> Enum.map(fn
