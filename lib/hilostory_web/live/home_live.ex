@@ -1,43 +1,110 @@
 defmodule HilostoryWeb.HomeLive do
+  alias Phoenix.LiveView.AsyncResult
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.DeviceValue.TargetTemperature
   alias Hilostory.DeviceValue.Temperature
   alias Hilostory.DeviceValue.Power
   alias Hilostory.Infrastructure.DeviceValueRepository
+
   use HilostoryWeb, :live_view
 
   @impl true
   def mount(_params, _session, socket) do
-    socket = assign_async(socket, :data, &fetch_data/0)
+    socket =
+      socket
+      |> start_async(:fetch_devices, &fetch_devices/0)
+      |> assign(devices: AsyncResult.loading())
+
     {:ok, socket}
   end
 
   @impl true
   def render(assigns) do
+    device_data_loaded? =
+      assigns.devices.ok? and
+        Enum.all?(assigns.devices.result, fn device ->
+          Map.has_key?(assigns, device.id |> Integer.to_string() |> String.to_existing_atom())
+        end)
+
+    assigns =
+      if device_data_loaded? do
+        assign(assigns,
+          devices_data:
+            Map.filter(assigns, fn {device_id, _} ->
+              device_id |> Atom.to_string() |> Integer.parse() != :error
+            end)
+        )
+      else
+        assign(assigns, devices_data: nil)
+      end
+
     ~H"""
-    <.async_result :let={data} assign={@data}>
+    <.async_result :let={devices} assign={@devices}>
       <:loading>Loading data</:loading>
       <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
 
-      <div class="chart-grid">
-        <div
-          :for={{device, device_data} <- data}
-          id={"chart-#{device.name}"}
-          phx-hook="Chart"
-          data-device-name={device.name}
-          data-data={device_data}
-        />
-      </div>
+      <button phx-click="refresh">Refresh</button>
+      <div :for={device <- devices} id={"chart-#{device.name}"} phx-update="ignore" />
     </.async_result>
+    <div :if={@devices_data != nil}>
+      <div :for={{_, device_data_result} <- @devices_data}>
+        <.async_result :let={{device, device_data}} assign={device_data_result}>
+          <:loading>Loading data</:loading>
+          <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
+
+          <div
+            id={"chart-#{device.name}-data"}
+            phx-hook="Chart"
+            data-data={device_data}
+            data-device-name={device.name}
+          />
+        </.async_result>
+      </div>
+    </div>
     """
   end
 
-  defp fetch_data() do
-    device_data =
-      DeviceRepository.all()
-      |> Map.new(fn device -> {device, fetch_device_data(device.id)} end)
+  @impl true
+  def handle_event("refresh", _, socket) do
+    devices = socket.assigns.devices.result
 
-    {:ok, %{data: device_data}}
+    device_ids =
+      Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
+
+    {:noreply, assign_async(socket, device_ids, fn -> fetch_data(devices) end)}
+  end
+
+  @impl true
+  def handle_async(:fetch_devices, result, socket) do
+    case result do
+      {:ok, devices} ->
+        device_ids =
+          Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
+
+        socket =
+          socket
+          |> assign(devices: AsyncResult.ok(devices))
+          |> assign_async(device_ids, fn -> fetch_data(devices) end)
+
+        {:noreply, socket}
+
+      {:exit, reason} ->
+        {:noreply, assign(socket, devices: AsyncResult.ok(nil) |> AsyncResult.failed(reason))}
+    end
+  end
+
+  defp fetch_devices() do
+    DeviceRepository.all()
+  end
+
+  defp fetch_data(devices) do
+    device_data =
+      Map.new(devices, fn device ->
+        {device.id |> Integer.to_string() |> String.to_existing_atom(),
+         {device, fetch_device_data(device.id)}}
+      end)
+
+    {:ok, device_data}
   end
 
   defp fetch_device_data(device_id) do
