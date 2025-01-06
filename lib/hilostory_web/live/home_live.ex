@@ -44,7 +44,9 @@ defmodule HilostoryWeb.HomeLive do
       <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
 
       <button phx-click="refresh">Refresh</button>
-      <div :for={device <- devices} id={"chart-#{device.name}"} phx-update="ignore" />
+      <div class="chart-grid">
+        <div :for={device <- devices} id={"chart-#{device.name}"} phx-update="ignore" />
+      </div>
     </.async_result>
     <div :if={@devices_data != nil}>
       <div :for={{_, device_data_result} <- @devices_data}>

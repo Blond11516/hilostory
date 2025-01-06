@@ -14,10 +14,11 @@ const sync = uPlot.sync("chartsSync")
 const Chart: ViewHook<{ chart?: uPlot}> = {
 	mounted() {
 		const deviceName = this.el.getAttribute("data-device-name")!
+		const chartContainer = document.getElementById("chart-" + deviceName)!
 		const data = parseDeviceData(this.el)
 		const opts: uPlot.Options = {
 			title: deviceName,
-			width: this.el.offsetWidth,
+			width: chartContainer.offsetWidth,
 			height: 400,
 			series: [
 				{},
@@ -70,7 +71,7 @@ const Chart: ViewHook<{ chart?: uPlot}> = {
 			}
 		};
 		
-		const plot = new uPlot(opts, data, document.getElementById("chart-" + deviceName)!);
+		const plot = new uPlot(opts, data, chartContainer);
 		this.chart = plot
 		sync.sub(plot)
 	},
