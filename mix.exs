@@ -54,6 +54,7 @@ defmodule Hilostory.MixProject do
       {:telemetry_metrics, "1.0.0"},
       {:telemetry_poller, "1.1.0"},
       {:bandit, "1.6.5"},
+      {:mint, "1.6.2"},
       {:igniter, "0.5.11", only: :dev},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false}
     ]
