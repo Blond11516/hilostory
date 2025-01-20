@@ -24,7 +24,7 @@ defmodule HilostoryWeb.AuthController do
   end
 
   def callback(conn, params) do
-    conn = conn |> fetch_session()
+    conn = conn |> fetch_session() |> fetch_flash()
 
     with {:ok, authorization_code} <- Map.fetch(params, "code"),
          {:ok, state} <- Map.fetch(params, "state"),
