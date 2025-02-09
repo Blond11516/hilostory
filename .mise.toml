@@ -1,4 +1,4 @@
 [tools]
 elixir = "1.18.1-otp-27"
 erlang = "27.2"
-bun = "1.1.45"
+bun = "1.2.0"

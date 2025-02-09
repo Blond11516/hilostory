@@ -21,19 +21,20 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "topbar"
-import uPlot from "uplot"
 
 // Import app.css so it is bundled by esbuild
 import "../css/app.css"
 import "uplot/dist/uPlot.min.css"
 import Chart from "./chart_hook"
+import PushTimeZone from "./push_time_zone_hook"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']")!.getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
   hooks: {
-    Chart
+    Chart,
+    PushTimeZone
   }
 })
 

@@ -14,6 +14,10 @@ defmodule HilostoryWeb.HomeLive do
       socket
       |> start_async(:fetch_devices, &fetch_devices/0)
       |> assign(devices: AsyncResult.loading())
+      |> assign(
+        period:
+          {DateTime.utc_now() |> DateTime.shift(Duration.new!(hour: -1)), DateTime.utc_now()}
+      )
 
     {:ok, socket}
   end
@@ -39,6 +43,27 @@ defmodule HilostoryWeb.HomeLive do
       end
 
     ~H"""
+    <span id="time-zone-hook-target" style="display: none;" phx-hook="PushTimeZone" />
+
+    <form phx-submit="period-changed">
+      <div>Select data period to display</div>
+      <label for="datetime-start-input">From</label>
+      <input
+        type="datetime-local"
+        id="datetime-start-input"
+        name="start"
+        value={format_date_time_for_input(elem(@period, 0))}
+      />
+      <label for="datetime-end-input">To</label>
+      <input
+        type="datetime-local"
+        id="datetime-end-input"
+        name="end"
+        value={format_date_time_for_input(elem(@period, 1))}
+      />
+      <button type="submit">Apply</button>
+    </form>
+
     <.async_result :let={devices} assign={@devices}>
       <:loading>Loading data</:loading>
       <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
@@ -68,12 +93,42 @@ defmodule HilostoryWeb.HomeLive do
 
   @impl true
   def handle_event("refresh", _, socket) do
-    devices = socket.assigns.devices.result
+    {:noreply, refresh(socket)}
+  end
 
-    device_ids =
-      Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
+  def handle_event("period-changed", params, socket) do
+    period_start =
+      params
+      |> Map.fetch!("start")
+      |> parse_date_time_input_value(socket.assigns.time_zone)
 
-    {:noreply, assign_async(socket, device_ids, fn -> fetch_data(devices) end)}
+    period_end =
+      params
+      |> Map.fetch!("end")
+      |> parse_date_time_input_value(socket.assigns.time_zone)
+
+    socket =
+      socket
+      |> assign(period: {period_start, period_end})
+      |> refresh()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("set-timezone", params, socket) do
+    time_zone = params["time-zone"]
+    {period_start, period_end} = socket.assigns.period
+
+    socket =
+      socket
+      |> assign(
+        period:
+          {DateTime.shift_zone!(period_start, time_zone),
+           DateTime.shift_zone!(period_end, time_zone)}
+      )
+      |> assign(time_zone: time_zone)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -83,10 +138,12 @@ defmodule HilostoryWeb.HomeLive do
         device_ids =
           Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
 
+        period = socket.assigns.period
+
         socket =
           socket
           |> assign(devices: AsyncResult.ok(devices))
-          |> assign_async(device_ids, fn -> fetch_data(devices) end)
+          |> assign_async(device_ids, fn -> fetch_data(devices, period) end)
 
         {:noreply, socket}
 
@@ -95,30 +152,51 @@ defmodule HilostoryWeb.HomeLive do
     end
   end
 
+  defp parse_date_time_input_value(value, time_zone) do
+    value
+    |> then(&(&1 <> ":00"))
+    |> NaiveDateTime.from_iso8601!()
+    |> DateTime.from_naive!(time_zone)
+  end
+
+  defp refresh(socket) do
+    devices = socket.assigns.devices.result
+
+    device_ids =
+      Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
+
+    period = socket.assigns.period
+    assign_async(socket, device_ids, fn -> fetch_data(devices, period) end)
+  end
+
+  defp format_date_time_for_input(%DateTime{} = date_time) do
+    Calendar.strftime(date_time, "%Y-%m-%dT%H:%M")
+  end
+
   defp fetch_devices() do
     DeviceRepository.all()
   end
 
-  defp fetch_data(devices) do
+  defp fetch_data(devices, period) do
     device_data =
       Map.new(devices, fn device ->
         {device.id |> Integer.to_string() |> String.to_existing_atom(),
-         {device, fetch_device_data(device.id)}}
+         {device, fetch_device_data(device.id, period)}}
       end)
 
     {:ok, device_data}
   end
 
-  defp fetch_device_data(device_id) do
+  defp fetch_device_data(device_id, period) do
     power_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(Power, device_id)
+        DeviceValueRepository.fetch(Power, device_id, period)
         |> Map.new(fn %Power{} = value -> {DateTime.to_unix(value.timestamp), value.power} end)
       end)
 
     temperature_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(Temperature, device_id)
+        DeviceValueRepository.fetch(Temperature, device_id, period)
         |> Map.new(fn %Temperature{} = value ->
           {DateTime.to_unix(value.timestamp), value.temperature}
         end)
@@ -126,7 +204,7 @@ defmodule HilostoryWeb.HomeLive do
 
     target_temperature_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(TargetTemperature, device_id)
+        DeviceValueRepository.fetch(TargetTemperature, device_id, period)
         |> Map.new(fn %TargetTemperature{} = value ->
           {DateTime.to_unix(value.timestamp), value.target_temperature}
         end)

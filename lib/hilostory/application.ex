@@ -7,20 +7,22 @@ defmodule Hilostory.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      HilostoryWeb.Telemetry,
-      Hilostory.Repo,
-      Hilostory.Joken.HiloStrategy,
-      Hilostory.TokenRefreshScheduler,
-      {Phoenix.PubSub, name: Hilostory.PubSub},
-      Hilostory.Vault,
-      Hilostory.WebsocketSuperviser,
-      Hilostory.WebsocketStarter,
-      # Start a worker by calling: Hilostory.Worker.start_link(arg)
-      # {Hilostory.Worker, arg},
-      # Start to serve requests, typically the last entry
-      HilostoryWeb.Endpoint
-    ]
+    children =
+      [
+        HilostoryWeb.Telemetry,
+        Hilostory.Repo,
+        Hilostory.Joken.HiloStrategy,
+        Hilostory.TokenRefreshScheduler,
+        {Phoenix.PubSub, name: Hilostory.PubSub},
+        Hilostory.Vault,
+        Hilostory.WebsocketSuperviser,
+        Hilostory.WebsocketStarter,
+        # Start a worker by calling: Hilostory.Worker.start_link(arg)
+        # {Hilostory.Worker, arg},
+        # Start to serve requests, typically the last entry
+        HilostoryWeb.Endpoint
+      ]
+      |> append_if(Application.get_env(:hilostory, :env) != :test, {Tz.UpdatePeriodically, []})
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -34,5 +36,9 @@ defmodule Hilostory.Application do
   def config_change(changed, _new, removed) do
     HilostoryWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp append_if(list, condition, item) do
+    if condition, do: list ++ [item], else: list
   end
 end

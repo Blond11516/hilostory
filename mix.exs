@@ -32,6 +32,8 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:castore, "1.0.11"},
+      {:tz, "0.28.1"},
       {:timescale, "0.1.1"},
       {:typed_struct, "0.3.0"},
       {:recase, "0.8.1"},

@@ -7,3 +7,4 @@
 - gérer les messages avec type "complete"
 - gérer les messages avec target "GatewayValuesReceived"
 - setuper le suivi des erreurs avec tower/sentry
+- trouver comment fetcher le jwks plus rapidement

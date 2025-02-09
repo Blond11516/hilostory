@@ -77,8 +77,8 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
     |> Repo.insert()
   end
 
-  @spec fetch(value_module(), integer()) :: struct()
-  def fetch(value, device_id)
+  @spec fetch(value_module(), integer(), {DateTime.t(), Datetime.t()}) :: struct()
+  def fetch(value, device_id, period)
       when value in [
              ConnectionState,
              PairingState,
@@ -101,13 +101,14 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
         DrmsState -> DrmsStateSchema
       end
 
-    now_minus_24_hours = DateTime.utc_now() |> DateTime.add(-24, :hour)
+    {period_start, period_end} = period
 
     Repo.all(
       from v in value_schema,
         where:
           v.device_id == ^device_id and
-            v.timestamp > ^now_minus_24_hours,
+            v.timestamp > ^period_start and
+            v.timestamp < ^period_end,
         select: v
     )
     |> Enum.map(fn
