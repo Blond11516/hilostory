@@ -37,7 +37,7 @@ defmodule Hilostory.MixProject do
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
       {:ecto_sql, "3.12.1"},
-      {:esbuild, "0.8.2", runtime: Mix.env() == :dev},
+      {:esbuild, "0.9.0", runtime: Mix.env() == :dev},
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
       {:mint, "1.7.1"},
@@ -45,7 +45,7 @@ defmodule Hilostory.MixProject do
       {:phoenix_ecto, "4.6.3"},
       {:phoenix_html, "4.2.0"},
       {:phoenix_live_dashboard, "0.8.6"},
-      {:phoenix_live_view, "1.0.2"},
+      {:phoenix_live_view, "1.0.4"},
       {:postgrex, "0.20.0"},
       {:recase, "0.8.1"},
       {:req, "0.5.8"},
@@ -56,7 +56,7 @@ defmodule Hilostory.MixProject do
       {:tz, "0.28.1"},
       {:websockex, "0.4.3"},
       {:phoenix_live_reload, "1.5.3", only: :dev},
-      {:igniter, "0.5.21", only: :dev},
+      {:igniter, "0.5.24", only: :dev},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:floki, "0.37.0", only: :test}
     ]
