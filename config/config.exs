@@ -24,7 +24,7 @@ config :hilostory, HilostoryWeb.Endpoint,
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.17.11",
+  version: "0.25.0",
   hilostory: [
     args:
       ~w(ts/app.ts --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
