@@ -8,16 +8,18 @@ defmodule HilostoryWeb.HomeLive do
 
   use HilostoryWeb, :live_view
 
+  @type predefined_period :: :last_hour | :last_day | :last_am_challenge | :last_pm_challenge
+  @type period :: {:predefined, predefined_period()} | {:custom, {DateTime.t(), DateTime.t()}}
+
+  @predefined_periods [:last_hour, :last_day, :last_am_challenge, :last_pm_challenge]
+
   @impl true
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> start_async(:fetch_devices, &fetch_devices/0)
       |> assign(devices: AsyncResult.loading())
-      |> assign(
-        period:
-          {DateTime.utc_now() |> DateTime.shift(Duration.new!(hour: -1)), DateTime.utc_now()}
-      )
+      |> assign(period: {:predefined, :last_hour})
+      |> assign(pending_custom_period?: false)
 
     {:ok, socket}
   end
@@ -42,24 +44,40 @@ defmodule HilostoryWeb.HomeLive do
         assign(assigns, devices_data: nil)
       end
 
+    assigns =
+      assign(assigns,
+        predefined_periods: @predefined_periods,
+        time_zone: Map.get(assigns, :time_zone, nil)
+      )
+
     ~H"""
     <span id="time-zone-hook-target" style="display: none;" phx-hook="PushTimeZone" />
 
-    <form phx-submit="period-changed">
+    <form phx-submit="period-submitted" phx-change="period-changed">
       <div>Select data period to display</div>
+      <label for="period-type-input">Period</label>
+      <select id="period-type-input" name="period-type" value={format_period_option_value(@period)}>
+        <option :for={period <- @predefined_periods} value={format_period_option_value(period)}>
+          {format_predefined_period_option_display_name(period)}
+        </option>
+        <option value="custom">Custom</option>
+      </select>
       <label for="datetime-start-input">From</label>
+      <!-- TODO for predefined periods, should store the last fetched period to avoid the displayed period changing on unrelated updates -->
       <input
         type="datetime-local"
         id="datetime-start-input"
         name="start"
-        value={format_date_time_for_input(elem(@period, 0))}
+        disabled={not match?({:custom, _}, @period) and not @pending_custom_period?}
+        value={format_date_time_for_input(@period, :start, @time_zone)}
       />
       <label for="datetime-end-input">To</label>
       <input
         type="datetime-local"
         id="datetime-end-input"
         name="end"
-        value={format_date_time_for_input(elem(@period, 1))}
+        disabled={not match?({:custom, _}, @period) and not @pending_custom_period?}
+        value={format_date_time_for_input(@period, :end, @time_zone)}
       />
       <button type="submit">Apply</button>
     </form>
@@ -96,37 +114,36 @@ defmodule HilostoryWeb.HomeLive do
     {:noreply, refresh(socket)}
   end
 
-  def handle_event("period-changed", params, socket) do
-    period_start =
-      params
-      |> Map.fetch!("start")
-      |> parse_date_time_input_value(socket.assigns.time_zone)
-
-    period_end =
-      params
-      |> Map.fetch!("end")
-      |> parse_date_time_input_value(socket.assigns.time_zone)
+  def handle_event("period-submitted", params, socket) do
+    period = parse_updated_period(params, socket.assigns.time_zone)
 
     socket =
       socket
-      |> assign(period: {period_start, period_end})
+      |> assign(period: period)
+      |> assign(pending_custom_period?: false)
       |> refresh()
 
     {:noreply, socket}
   end
 
+  def handle_event("period-changed", params, socket) do
+    {:noreply, assign(socket, pending_custom_period?: params["period-type"] == "custom")}
+  end
+
   def handle_event("set-timezone", params, socket) do
     time_zone = params["time-zone"]
-    {period_start, period_end} = socket.assigns.period
+
+    period =
+      case socket.assigns.period do
+        {:custom, _} -> {:custom, get_current_period(socket.assigns.period, time_zone)}
+        period -> period
+      end
 
     socket =
       socket
-      |> assign(
-        period:
-          {DateTime.shift_zone!(period_start, time_zone),
-           DateTime.shift_zone!(period_end, time_zone)}
-      )
+      |> assign(period: period)
       |> assign(time_zone: time_zone)
+      |> start_async(:fetch_devices, &fetch_devices/0)
 
     {:noreply, socket}
   end
@@ -138,7 +155,7 @@ defmodule HilostoryWeb.HomeLive do
         device_ids =
           Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
 
-        period = socket.assigns.period
+        period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
 
         socket =
           socket
@@ -149,6 +166,79 @@ defmodule HilostoryWeb.HomeLive do
 
       {:exit, reason} ->
         {:noreply, assign(socket, devices: AsyncResult.ok(nil) |> AsyncResult.failed(reason))}
+    end
+  end
+
+  @spec format_period_option_value(period()) :: String.t()
+  defp format_period_option_value({:custom, _}), do: "custom"
+  defp format_period_option_value({:predefined, period}), do: format_period_option_value(period)
+
+  defp format_period_option_value(period) when period in @predefined_periods,
+    do: Atom.to_string(period)
+
+  @spec format_predefined_period_option_display_name(predefined_period()) :: String.t()
+  defp format_predefined_period_option_display_name(:last_hour), do: "Last hour"
+  defp format_predefined_period_option_display_name(:last_day), do: "Last day"
+  defp format_predefined_period_option_display_name(:last_am_challenge), do: "Last AM challenge"
+  defp format_predefined_period_option_display_name(:last_pm_challenge), do: "Last PM challenge"
+
+  @spec get_current_period(period(), Calendar.time_zone()) :: {DateTime.t(), DateTime.t()}
+  defp get_current_period({:custom, {period_start, period_end}}, time_zone),
+    do:
+      {DateTime.shift_zone!(period_start, time_zone), DateTime.shift_zone!(period_end, time_zone)}
+
+  defp get_current_period({:predefined, :last_hour}, _time_zone),
+    do: {DateTime.utc_now() |> DateTime.shift(Duration.new!(hour: -1)), DateTime.utc_now()}
+
+  defp get_current_period({:predefined, :last_day}, _time_zone),
+    do: {DateTime.utc_now() |> DateTime.shift(Duration.new!(hour: -24)), DateTime.utc_now()}
+
+  defp get_current_period({:predefined, :last_am_challenge}, time_zone) do
+    get_challenge_period({Time.new!(4, 0, 0), Time.new!(11, 0, 0)}, time_zone)
+  end
+
+  defp get_current_period({:predefined, :last_pm_challenge}, time_zone) do
+    get_challenge_period({Time.new!(15, 0, 0), Time.new!(22, 0, 0)}, time_zone)
+  end
+
+  defp get_challenge_period(challenge_time_period, time_zone) do
+    {challenge_start, challenge_end} = challenge_time_period |> IO.inspect(label: "challenge_time_period")
+    time_now = DateTime.now!(time_zone) |> DateTime.to_time() |> IO.inspect(label: "time now")
+
+    today = DateTime.utc_now() |> DateTime.shift_zone!(time_zone) |> DateTime.to_date() |> IO.inspect(label: "today")
+
+    challenge_day =
+      if Time.compare(time_now, challenge_start) == :lt do
+        Date.shift(today, Duration.new!(day: -1))
+      else
+        today
+      end
+      |> IO.inspect(label: "challenge day")
+
+    period_start = DateTime.new!(challenge_day, challenge_start, time_zone)
+    period_end = DateTime.new!(challenge_day, challenge_end, time_zone)
+
+    {period_start, period_end} |> IO.inspect(label: "challenge period")
+  end
+
+  @spec parse_updated_period(%{String.t() => String.t()}, Calendar.time_zone()) :: period()
+  defp parse_updated_period(params, time_zone) do
+    case params["period-type"] do
+      "custom" ->
+        period_start =
+          params
+          |> Map.fetch!("start")
+          |> parse_date_time_input_value(time_zone)
+
+        period_end =
+          params
+          |> Map.fetch!("end")
+          |> parse_date_time_input_value(time_zone)
+
+        {:custom, {period_start, period_end}}
+
+      type ->
+        {:predefined, String.to_existing_atom(type)}
     end
   end
 
@@ -165,12 +255,25 @@ defmodule HilostoryWeb.HomeLive do
     device_ids =
       Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
 
-    period = socket.assigns.period
+    period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
     assign_async(socket, device_ids, fn -> fetch_data(devices, period) end)
   end
 
-  defp format_date_time_for_input(%DateTime{} = date_time) do
-    Calendar.strftime(date_time, "%Y-%m-%dT%H:%M")
+  @spec format_date_time_for_input(period(), :start | :end, Calendar.time_zone() | nil) ::
+          String.t()
+  defp format_date_time_for_input(_, _, nil), do: ""
+
+  defp format_date_time_for_input(period, start_or_end, time_zone) do
+    period
+    |> get_current_period(time_zone)
+    |> then(fn {period_start, period_end} ->
+      case start_or_end do
+        :start -> period_start
+        :end -> period_end
+      end
+    end)
+    |> DateTime.shift_zone!(time_zone)
+    |> Calendar.strftime("%Y-%m-%dT%H:%M")
   end
 
   defp fetch_devices() do
