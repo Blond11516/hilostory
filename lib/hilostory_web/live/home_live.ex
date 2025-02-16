@@ -49,18 +49,17 @@ defmodule HilostoryWeb.HomeLive do
         predefined_periods: @predefined_periods,
         time_zone: Map.get(assigns, :time_zone, nil)
       )
-
     ~H"""
     <span id="time-zone-hook-target" style="display: none;" phx-hook="PushTimeZone" />
 
     <form phx-submit="period-submitted" phx-change="period-changed">
       <div>Select data period to display</div>
       <label for="period-type-input">Period</label>
-      <select id="period-type-input" name="period-type" value={format_period_option_value(@period)}>
-        <option :for={period <- @predefined_periods} value={format_period_option_value(period)}>
+      <select id="period-type-input" name="period-type">
+        <option :for={period <- @predefined_periods} value={Atom.to_string(period)} selected={match?({:predefined, ^period}, @period)}>
           {format_predefined_period_option_display_name(period)}
         </option>
-        <option value="custom">Custom</option>
+        <option value="custom" selected={match?({:custom, _}, @period) or @pending_custom_period?}>Custom</option>
       </select>
       <label for="datetime-start-input">From</label>
       <!-- TODO for predefined periods, should store the last fetched period to avoid the displayed period changing on unrelated updates -->
@@ -169,13 +168,6 @@ defmodule HilostoryWeb.HomeLive do
     end
   end
 
-  @spec format_period_option_value(period()) :: String.t()
-  defp format_period_option_value({:custom, _}), do: "custom"
-  defp format_period_option_value({:predefined, period}), do: format_period_option_value(period)
-
-  defp format_period_option_value(period) when period in @predefined_periods,
-    do: Atom.to_string(period)
-
   @spec format_predefined_period_option_display_name(predefined_period()) :: String.t()
   defp format_predefined_period_option_display_name(:last_hour), do: "Last hour"
   defp format_predefined_period_option_display_name(:last_day), do: "Last day"
@@ -223,6 +215,7 @@ defmodule HilostoryWeb.HomeLive do
 
   @spec parse_updated_period(%{String.t() => String.t()}, Calendar.time_zone()) :: period()
   defp parse_updated_period(params, time_zone) do
+    IO.inspect(params)
     case params["period-type"] do
       "custom" ->
         period_start =
