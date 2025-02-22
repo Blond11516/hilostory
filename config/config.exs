@@ -43,13 +43,15 @@ config :phoenix, :json_library, JSON
 config :cloak, json_library: JSON
 config :postgrex, json_librar: JSON
 
-config :tesla, JokenJwks.HttpFetcher, adapter: Tesla.Adapter.Mint
+config :tesla, JokenJwks.HttpFetcher, adapter: Tesla.Adapter.Finch
 
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 config :hilostory, env: Mix.env()
 
 config :tz, reject_periods_before_year: 2024
+
+config :sentry, client: Hilostory.Sentry.FinchClient
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

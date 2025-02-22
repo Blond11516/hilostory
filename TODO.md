@@ -6,5 +6,4 @@
   - obtenir le token par un process pour centraliser le fetching et la validation?
 - gérer les messages avec type "complete"
 - gérer les messages avec target "GatewayValuesReceived"
-- setuper le suivi des erreurs avec tower/sentry
 - trouver comment fetcher le jwks plus rapidement

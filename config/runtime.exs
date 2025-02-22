@@ -94,4 +94,6 @@ if config_env() == :prod do
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
+
+  config :tower_sentry, dsn: System.fetch_env!("SENTRY_DSN")
 end
