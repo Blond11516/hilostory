@@ -43,7 +43,7 @@ config :phoenix, :json_library, JSON
 config :cloak, json_library: JSON
 config :postgrex, json_librar: JSON
 
-config :tesla, JokenJwks.HttpFetcher, adapter: Tesla.Adapter.Finch
+config :tesla, JokenJwks.HttpFetcher, adapter: {Tesla.Adapter.Finch, name: :joken_jwks_client}
 
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
