@@ -41,9 +41,9 @@ defmodule Hilostory.MixProject do
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
       {:mint, "1.7.1"},
-      {:phoenix, "1.7.19"},
+      {:phoenix, "1.7.20"},
       {:phoenix_ecto, "4.6.3"},
-      {:phoenix_html, "4.2.0"},
+      {:phoenix_html, "4.2.1"},
       {:phoenix_live_dashboard, "0.8.6"},
       {:phoenix_live_view, "1.0.4"},
       {:postgrex, "0.20.0"},
@@ -56,7 +56,7 @@ defmodule Hilostory.MixProject do
       {:tz, "0.28.1"},
       {:websockex, "0.4.3"},
       {:phoenix_live_reload, "1.5.3", only: :dev},
-      {:igniter, "0.5.24", only: :dev},
+      {:igniter, "0.5.27", only: :dev},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:floki, "0.37.0", only: :test}
     ]
