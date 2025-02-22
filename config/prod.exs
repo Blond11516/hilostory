@@ -14,3 +14,4 @@ config :logger, level: :info
 # of environment variables, is done on config/runtime.exs.
 
 config :tower, :reporters, [TowerSentry]
+config :tower_sentry, environment_name: :prod

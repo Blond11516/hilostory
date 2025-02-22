@@ -53,7 +53,6 @@ config :tz, reject_periods_before_year: 2024
 
 config :sentry,
   client: Hilostory.Sentry.FinchClient,
-  environment_name: config_env(),
   enable_source_code_context: true,
   root_source_code_paths: [File.cwd!()],
   release: System.cmd("git", ["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
