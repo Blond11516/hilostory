@@ -33,7 +33,7 @@ defmodule Hilostory.MixProject do
   defp deps do
     [
       {:bandit, "1.6.7"},
-      {:castore, "1.0.11"},
+      {:castore, "1.0.12"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
       {:ecto_sql, "3.12.1"},
@@ -45,19 +45,19 @@ defmodule Hilostory.MixProject do
       {:phoenix_ecto, "4.6.3"},
       {:phoenix_html, "4.2.1"},
       {:phoenix_live_dashboard, "0.8.6"},
-      {:phoenix_live_view, "1.0.4"},
+      {:phoenix_live_view, "1.0.5"},
       {:postgrex, "0.20.0"},
       {:recase, "0.8.1"},
       {:req, "0.5.8"},
       {:telemetry_metrics, "1.1.0"},
       {:telemetry_poller, "1.1.0"},
-      {:tower_sentry, "0.3.2"},
+      {:tower_sentry, "0.3.3"},
       {:timescale, "0.1.1"},
       {:typed_struct, "0.3.0"},
       {:tz, "0.28.1"},
       {:websockex, "0.4.3"},
       {:phoenix_live_reload, "1.5.3", only: :dev},
-      {:igniter, "0.5.27", only: :dev},
+      {:igniter, "0.5.29", only: :dev},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:floki, "0.37.0", only: :test}
     ]
