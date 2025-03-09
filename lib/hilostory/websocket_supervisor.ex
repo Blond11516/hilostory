@@ -2,6 +2,7 @@ defmodule Hilostory.WebsocketSupervisor do
   use DynamicSupervisor
 
   alias Hilostory.Infrastructure.Hilo.WebsocketClient
+  alias Hilostory.SupervisorChildStartErrorLogger
 
   def start_link(_) do
     DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)
@@ -15,6 +16,9 @@ defmodule Hilostory.WebsocketSupervisor do
   def start_websocket(tokens, location) do
     connected_callback = fn -> WebsocketClient.subscribe_to_location(self(), location) end
 
-    DynamicSupervisor.start_child(__MODULE__, {WebsocketClient, {tokens, connected_callback}})
+    DynamicSupervisor.start_child(
+      __MODULE__,
+      SupervisorChildStartErrorLogger.child_spec(WebsocketClient, {tokens, connected_callback})
+    )
   end
 end
