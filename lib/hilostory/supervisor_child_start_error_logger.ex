@@ -16,15 +16,11 @@ defmodule Hilostory.SupervisorChildStartErrorLogger do
   end
 
   def start_link(module, start_argument) do
-    try do
-      module.start_link(start_argument)
-    rescue
-      error ->
-        Logger.error(
-          "Failed to start #{inspect(module)} with argument #{inspect(start_argument)}: #{inspect(error)}"
-        )
+    module.start_link(start_argument)
+  rescue
+    error ->
+      Logger.error("Failed to start #{inspect(module)} with argument #{inspect(start_argument)}: #{inspect(error)}")
 
-        reraise error, __STACKTRACE__
-    end
+      reraise error, __STACKTRACE__
   end
 end

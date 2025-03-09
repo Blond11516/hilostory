@@ -1,4 +1,5 @@
 defmodule HilostoryWeb.LoginLive do
+  @moduledoc false
   use HilostoryWeb, :live_view
 
   @impl true

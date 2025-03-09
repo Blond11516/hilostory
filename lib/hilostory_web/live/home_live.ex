@@ -1,12 +1,13 @@
 defmodule HilostoryWeb.HomeLive do
-  alias Phoenix.LiveView.AsyncResult
-  alias Hilostory.Infrastructure.DeviceRepository
+  @moduledoc false
+  use HilostoryWeb, :live_view
+
+  alias Hilostory.DeviceValue.Power
   alias Hilostory.DeviceValue.TargetTemperature
   alias Hilostory.DeviceValue.Temperature
-  alias Hilostory.DeviceValue.Power
+  alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Infrastructure.DeviceValueRepository
-
-  use HilostoryWeb, :live_view
+  alias Phoenix.LiveView.AsyncResult
 
   @type predefined_period :: :last_hour | :last_day | :last_am_challenge | :last_pm_challenge
   @type period :: {:predefined, predefined_period()} | {:custom, {DateTime.t(), DateTime.t()}}
@@ -49,6 +50,7 @@ defmodule HilostoryWeb.HomeLive do
         predefined_periods: @predefined_periods,
         time_zone: Map.get(assigns, :time_zone, nil)
       )
+
     ~H"""
     <span id="time-zone-hook-target" style="display: none;" phx-hook="PushTimeZone" />
 
@@ -56,10 +58,16 @@ defmodule HilostoryWeb.HomeLive do
       <div>Select data period to display</div>
       <label for="period-type-input">Period</label>
       <select id="period-type-input" name="period-type">
-        <option :for={period <- @predefined_periods} value={Atom.to_string(period)} selected={match?({:predefined, ^period}, @period)}>
+        <option
+          :for={period <- @predefined_periods}
+          value={Atom.to_string(period)}
+          selected={match?({:predefined, ^period}, @period)}
+        >
           {format_predefined_period_option_display_name(period)}
         </option>
-        <option value="custom" selected={match?({:custom, _}, @period) or @pending_custom_period?}>Custom</option>
+        <option value="custom" selected={match?({:custom, _}, @period) or @pending_custom_period?}>
+          Custom
+        </option>
       </select>
       <label for="datetime-start-input">From</label>
       <!-- TODO for predefined periods, should store the last fetched period to avoid the displayed period changing on unrelated updates -->
@@ -164,7 +172,7 @@ defmodule HilostoryWeb.HomeLive do
         {:noreply, socket}
 
       {:exit, reason} ->
-        {:noreply, assign(socket, devices: AsyncResult.ok(nil) |> AsyncResult.failed(reason))}
+        {:noreply, assign(socket, devices: nil |> AsyncResult.ok() |> AsyncResult.failed(reason))}
     end
   end
 
@@ -176,14 +184,13 @@ defmodule HilostoryWeb.HomeLive do
 
   @spec get_current_period(period(), Calendar.time_zone()) :: {DateTime.t(), DateTime.t()}
   defp get_current_period({:custom, {period_start, period_end}}, time_zone),
-    do:
-      {DateTime.shift_zone!(period_start, time_zone), DateTime.shift_zone!(period_end, time_zone)}
+    do: {DateTime.shift_zone!(period_start, time_zone), DateTime.shift_zone!(period_end, time_zone)}
 
   defp get_current_period({:predefined, :last_hour}, _time_zone),
-    do: {DateTime.utc_now() |> DateTime.shift(Duration.new!(hour: -1)), DateTime.utc_now()}
+    do: {DateTime.shift(DateTime.utc_now(), Duration.new!(hour: -1)), DateTime.utc_now()}
 
   defp get_current_period({:predefined, :last_day}, _time_zone),
-    do: {DateTime.utc_now() |> DateTime.shift(Duration.new!(hour: -24)), DateTime.utc_now()}
+    do: {DateTime.shift(DateTime.utc_now(), Duration.new!(hour: -24)), DateTime.utc_now()}
 
   defp get_current_period({:predefined, :last_am_challenge}, time_zone) do
     get_challenge_period({Time.new!(4, 0, 0), Time.new!(11, 0, 0)}, time_zone)
@@ -194,28 +201,26 @@ defmodule HilostoryWeb.HomeLive do
   end
 
   defp get_challenge_period(challenge_time_period, time_zone) do
-    {challenge_start, challenge_end} = challenge_time_period |> IO.inspect(label: "challenge_time_period")
-    time_now = DateTime.now!(time_zone) |> DateTime.to_time() |> IO.inspect(label: "time now")
+    {challenge_start, challenge_end} = challenge_time_period
+    time_now = time_zone |> DateTime.now!() |> DateTime.to_time()
 
-    today = DateTime.utc_now() |> DateTime.shift_zone!(time_zone) |> DateTime.to_date() |> IO.inspect(label: "today")
+    today = DateTime.utc_now() |> DateTime.shift_zone!(time_zone) |> DateTime.to_date()
 
     challenge_day =
-      if Time.compare(time_now, challenge_start) == :lt do
+      if Time.before?(time_now, challenge_start) do
         Date.shift(today, Duration.new!(day: -1))
       else
         today
       end
-      |> IO.inspect(label: "challenge day")
 
     period_start = DateTime.new!(challenge_day, challenge_start, time_zone)
     period_end = DateTime.new!(challenge_day, challenge_end, time_zone)
 
-    {period_start, period_end} |> IO.inspect(label: "challenge period")
+    {period_start, period_end}
   end
 
   @spec parse_updated_period(%{String.t() => String.t()}, Calendar.time_zone()) :: period()
   defp parse_updated_period(params, time_zone) do
-    IO.inspect(params)
     case params["period-type"] do
       "custom" ->
         period_start =
@@ -236,8 +241,7 @@ defmodule HilostoryWeb.HomeLive do
   end
 
   defp parse_date_time_input_value(value, time_zone) do
-    value
-    |> then(&(&1 <> ":00"))
+    (value <> ":00")
     |> NaiveDateTime.from_iso8601!()
     |> DateTime.from_naive!(time_zone)
   end
@@ -269,15 +273,14 @@ defmodule HilostoryWeb.HomeLive do
     |> Calendar.strftime("%Y-%m-%dT%H:%M")
   end
 
-  defp fetch_devices() do
+  defp fetch_devices do
     DeviceRepository.all()
   end
 
   defp fetch_data(devices, period) do
     device_data =
       Map.new(devices, fn device ->
-        {device.id |> Integer.to_string() |> String.to_existing_atom(),
-         {device, fetch_device_data(device.id, period)}}
+        {device.id |> Integer.to_string() |> String.to_existing_atom(), {device, fetch_device_data(device.id, period)}}
       end)
 
     {:ok, device_data}
@@ -286,13 +289,15 @@ defmodule HilostoryWeb.HomeLive do
   defp fetch_device_data(device_id, period) do
     power_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(Power, device_id, period)
+        Power
+        |> DeviceValueRepository.fetch(device_id, period)
         |> Map.new(fn %Power{} = value -> {DateTime.to_unix(value.timestamp), value.power} end)
       end)
 
     temperature_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(Temperature, device_id, period)
+        Temperature
+        |> DeviceValueRepository.fetch(device_id, period)
         |> Map.new(fn %Temperature{} = value ->
           {DateTime.to_unix(value.timestamp), value.temperature}
         end)
@@ -300,7 +305,8 @@ defmodule HilostoryWeb.HomeLive do
 
     target_temperature_task =
       Task.async(fn ->
-        DeviceValueRepository.fetch(TargetTemperature, device_id, period)
+        TargetTemperature
+        |> DeviceValueRepository.fetch(device_id, period)
         |> Map.new(fn %TargetTemperature{} = value ->
           {DateTime.to_unix(value.timestamp), value.target_temperature}
         end)
@@ -310,14 +316,13 @@ defmodule HilostoryWeb.HomeLive do
       Task.await_many([power_task, temperature_task, target_temperature_task])
 
     power_timestamps =
-      power_values |> MapSet.new(fn {timestamp, _} -> timestamp end)
+      MapSet.new(power_values, fn {timestamp, _} -> timestamp end)
 
     temperature_timestamps =
-      temperature_values |> MapSet.new(fn {timestamp, _} -> timestamp end)
+      MapSet.new(temperature_values, fn {timestamp, _} -> timestamp end)
 
     target_temperature_timestamps =
-      target_temperature_values
-      |> MapSet.new(fn {timestamp, _} -> timestamp end)
+      MapSet.new(target_temperature_values, fn {timestamp, _} -> timestamp end)
 
     all_timestamps =
       power_timestamps

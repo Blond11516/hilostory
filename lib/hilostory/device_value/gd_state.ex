@@ -1,4 +1,5 @@
 defmodule Hilostory.DeviceValue.GdState do
+  @moduledoc false
   use TypedStruct
 
   typedstruct enforce: true do

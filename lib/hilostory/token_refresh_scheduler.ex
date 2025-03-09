@@ -1,9 +1,10 @@
 defmodule Hilostory.TokenRefreshScheduler do
+  @moduledoc false
   use GenServer
 
-  require Logger
-
   alias Hilostory.TokenRefresher
+
+  require Logger
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
@@ -37,7 +38,7 @@ defmodule Hilostory.TokenRefreshScheduler do
     {:noreply, state}
   end
 
-  def start_loop() do
+  def start_loop do
     case TokenRefresher.calculate_time_until_refresh() do
       {:ok, refresh_in} ->
         Logger.info(

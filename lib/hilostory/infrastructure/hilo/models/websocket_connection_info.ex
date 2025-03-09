@@ -1,4 +1,5 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo do
+  @moduledoc false
   use TypedStruct
 
   typedstruct do

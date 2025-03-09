@@ -1,4 +1,5 @@
 defmodule Hilostory.Sentry.FinchClient do
+  @moduledoc false
   @behaviour Sentry.HTTPClient
 
   @impl true

@@ -1,14 +1,13 @@
 defmodule Hilostory.Infrastructure.Hilo.Models do
+  @moduledoc false
   @spec parse(%{String.t() => any()}, module(), %{atom() => (any() -> any())}) :: struct()
   def parse(data, model_module, field_parsers \\ %{})
 
-  def parse(datum, model_module, field_parsers)
-      when is_list(datum) and is_atom(model_module) and is_map(field_parsers) do
+  def parse(datum, model_module, field_parsers) when is_list(datum) and is_atom(model_module) and is_map(field_parsers) do
     Enum.map(datum, &parse(&1, model_module, field_parsers))
   end
 
-  def parse(data, model_module, field_parsers)
-      when is_map(data) and is_atom(model_module) and is_map(field_parsers) do
+  def parse(data, model_module, field_parsers) when is_map(data) and is_atom(model_module) and is_map(field_parsers) do
     data
     |> Map.new(fn {key, value} ->
       field_key =

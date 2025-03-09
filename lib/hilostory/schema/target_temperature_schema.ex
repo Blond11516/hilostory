@@ -1,6 +1,8 @@
 defmodule Hilostory.Schema.TargetTemperatureSchema do
-  alias Hilostory.Schema.DeviceSchema
+  @moduledoc false
   use Ecto.Schema
+
+  alias Hilostory.Schema.DeviceSchema
 
   @primary_key false
 

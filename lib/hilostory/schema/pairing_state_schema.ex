@@ -1,6 +1,8 @@
 defmodule Hilostory.Schema.PairingStateSchema do
-  alias Hilostory.Schema.DeviceSchema
+  @moduledoc false
   use Ecto.Schema
+
+  alias Hilostory.Schema.DeviceSchema
 
   @primary_key false
 

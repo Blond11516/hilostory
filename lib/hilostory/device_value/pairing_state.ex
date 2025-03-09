@@ -1,4 +1,5 @@
 defmodule Hilostory.DeviceValue.PairingState do
+  @moduledoc false
   use TypedStruct
 
   typedstruct enforce: true do

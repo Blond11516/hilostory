@@ -1,4 +1,5 @@
 defmodule Hilostory.Signalr.Message do
+  @moduledoc false
   @record_separator "\u001e"
 
   @type_codes_to_types %{

@@ -1,27 +1,28 @@
 defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
-  require Logger
-
+  @moduledoc false
   use WebSockex
 
-  alias Hilostory.Infrastructure.DeviceValueRepository
+  alias Hilostory.Device
+  alias Hilostory.DeviceValue.ConnectionState
   alias Hilostory.DeviceValue.DrmsState
   alias Hilostory.DeviceValue.GdState
-  alias Hilostory.DeviceValue.Power
   alias Hilostory.DeviceValue.Heating
+  alias Hilostory.DeviceValue.PairingState
+  alias Hilostory.DeviceValue.Power
   alias Hilostory.DeviceValue.TargetTemperature
   alias Hilostory.DeviceValue.Temperature
-  alias Hilostory.DeviceValue.PairingState
-  alias Hilostory.DeviceValue.ConnectionState
-  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesReceived
-  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived
   alias Hilostory.Infrastructure.DeviceRepository
-  alias Hilostory.Device
-  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived
-  alias Hilostory.Signalr.Message
+  alias Hilostory.Infrastructure.DeviceValueRepository
   alias Hilostory.Infrastructure.Hilo.BaseApiClient
   alias Hilostory.Infrastructure.Hilo.Models
-  alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
   alias Hilostory.Infrastructure.Hilo.Models.Location
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived
+  alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesReceived
+  alias Hilostory.Signalr.Message
+
+  require Logger
 
   def start_link({tokens, connected_callback}) do
     # try do
@@ -91,9 +92,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
          "type" => 1
        })}
 
-    Logger.debug(
-      "Sending websocket frame to subscribe to location #{location.id}: #{inspect(subsrciption_frame)}"
-    )
+    Logger.debug("Sending websocket frame to subscribe to location #{location.id}: #{inspect(subsrciption_frame)}")
 
     {:reply, subsrciption_frame, state}
   end
@@ -115,9 +114,10 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
   @impl true
   def handle_frame(frame, state) do
-    case frame do
-      {:text, frame_text} -> Message.from_websocket_frame(frame_text)
-    end
+    {:text, frame_text} = frame
+
+    frame_text
+    |> Message.from_websocket_frame()
     |> Enum.each(fn
       {:ok, message} ->
         Logger.debug("Handling message #{inspect(message)}")
@@ -138,8 +138,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     :ok
   end
 
-  defp get_connection_id(%URI{} = websocket_uri, websocket_access_token)
-       when is_binary(websocket_access_token) do
+  defp get_connection_id(%URI{} = websocket_uri, websocket_access_token) when is_binary(websocket_access_token) do
     resp =
       websocket_uri
       |> URI.parse()
@@ -178,9 +177,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     WebSockex.cast(self(), :pong)
   end
 
-  defp handle_message(
-         %Message{type: :invoke, target: "DeviceListInitialValuesReceived"} = message
-       ) do
+  defp handle_message(%Message{type: :invoke, target: "DeviceListInitialValuesReceived"} = message) do
     Logger.info("Handling \"DeviceListInitialValuesReceived\". Persisting devices in task.")
 
     Task.start(fn ->
@@ -212,9 +209,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     end)
   end
 
-  defp handle_message(
-         %Message{type: :invoke, target: "DeviceListUpdatedValuesReceived"} = message
-       ) do
+  defp handle_message(%Message{type: :invoke, target: "DeviceListUpdatedValuesReceived"} = message) do
     Logger.info("Handling \"DeviceListUpdatedValuesReceived\". Persisting devices in task.")
 
     Task.start(fn ->
@@ -224,8 +219,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
       |> hd()
       |> Models.parse(DeviceListUpdatedValuesReceived)
       |> Enum.each(fn %DeviceListUpdatedValuesReceived{} = device ->
-        DeviceRepository.update(device.id, device.name)
-        |> case do
+        case DeviceRepository.update(device.id, device.name) do
           {:ok, _} ->
             Logger.info("Successfully updated device #{device.id}")
 

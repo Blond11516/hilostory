@@ -58,6 +58,7 @@ defmodule Hilostory.MixProject do
       {:websockex, "0.4.3"},
       {:phoenix_live_reload, "1.5.3", only: :dev},
       {:igniter, "0.5.32", only: :dev},
+      {:styler, "1.4.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:floki, "0.37.0", only: :test}
     ]

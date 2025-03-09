@@ -1,4 +1,5 @@
 defmodule Hilostory.Schema.OauthTokensSchema do
+  @moduledoc false
   use Ecto.Schema
 
   alias Hilostory.Schema.EncryptedBinary

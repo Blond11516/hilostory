@@ -1,4 +1,5 @@
 defmodule Hilostory.Infrastructure.Hilo.AuthorizationClient do
+  @moduledoc false
   @hilo_login_base_url "https://connexion.hiloenergie.com"
   @hilo_oauth_path "/hilodirectoryb2c.onmicrosoft.com/B2C_1A_SIGN_IN/oauth2/v2.0"
   @home_assistant_redirect_uri "https://my.home-assistant.io/redirect/oauth"
@@ -29,8 +30,7 @@ defmodule Hilostory.Infrastructure.Hilo.AuthorizationClient do
       :authorize,
       %{
         "response_type" => "code",
-        "scope" =>
-          "openid https://HiloDirectoryB2C.onmicrosoft.com/hiloapis/user_impersonation offline_access",
+        "scope" => "openid https://HiloDirectoryB2C.onmicrosoft.com/hiloapis/user_impersonation offline_access",
         "client_id" => @hilo_client_id,
         "state" => state,
         "redirect_uri" => @home_assistant_redirect_uri,
@@ -92,8 +92,7 @@ defmodule Hilostory.Infrastructure.Hilo.AuthorizationClient do
     )
   end
 
-  defp build_hilo_oauth_uri(endpoint, query_params)
-       when endpoint in [:authorize, :token] and is_map(query_params) do
+  defp build_hilo_oauth_uri(endpoint, query_params) when endpoint in [:authorize, :token] and is_map(query_params) do
     @hilo_login_base_url
     |> URI.new!()
     |> URI.append_path(@hilo_oauth_path)

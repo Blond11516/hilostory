@@ -1,11 +1,12 @@
 defmodule Hilostory.Infrastructure.DeviceRepository do
-  alias Hilostory.Schema.DeviceSchema
+  @moduledoc false
+  alias Ecto.Changeset
   alias Hilostory.Device
   alias Hilostory.Repo
-  alias Ecto.Changeset
+  alias Hilostory.Schema.DeviceSchema
 
   def upsert(%Device{} = device) do
-    params = Map.drop(device, [:__struct__])
+    params = Map.delete(device, :__struct__)
 
     %DeviceSchema{}
     |> Changeset.cast(params, [:id, :hilo_id, :name, :type])
@@ -18,7 +19,7 @@ defmodule Hilostory.Infrastructure.DeviceRepository do
     |> Repo.update()
   end
 
-  def all() do
+  def all do
     Repo.all(DeviceSchema)
   end
 end

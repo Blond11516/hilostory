@@ -7,23 +7,29 @@ defmodule Hilostory.Application do
 
   @impl true
   def start(_type, _args) do
+    base_children = [
+      HilostoryWeb.Telemetry,
+      Hilostory.Repo,
+      {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
+      Hilostory.Joken.HiloStrategy,
+      Hilostory.TokenRefreshScheduler,
+      {Phoenix.PubSub, name: Hilostory.PubSub},
+      Hilostory.Vault,
+      Hilostory.WebsocketSupervisor,
+      Hilostory.WebsocketStarter,
+      HilostoryWeb.Endpoint
+    ]
+
     children =
-      [
-        HilostoryWeb.Telemetry,
-        Hilostory.Repo,
-        {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
-        Hilostory.Joken.HiloStrategy,
-        Hilostory.TokenRefreshScheduler,
-        {Phoenix.PubSub, name: Hilostory.PubSub},
-        Hilostory.Vault,
-        Hilostory.WebsocketSupervisor,
-        Hilostory.WebsocketStarter,
-        # Start a worker by calling: Hilostory.Worker.start_link(arg)
-        # {Hilostory.Worker, arg},
-        # Start to serve requests, typically the last entry
-        HilostoryWeb.Endpoint
-      ]
-      |> append_if(Application.get_env(:hilostory, :env) != :test, {Tz.UpdatePeriodically, []})
+      append_if(
+        base_children,
+        Application.get_env(:hilostory, :env) != :test,
+        {Tz.UpdatePeriodically, []}
+      )
+
+    # Start a worker by calling: Hilostory.Worker.start_link(arg)
+    # {Hilostory.Worker, arg},
+    # Start to serve requests, typically the last entry
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

@@ -1,4 +1,5 @@
 defmodule Hilostory.DeviceValue.DrmsState do
+  @moduledoc false
   use TypedStruct
 
   typedstruct do

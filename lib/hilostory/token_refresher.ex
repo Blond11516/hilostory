@@ -1,29 +1,26 @@
 defmodule Hilostory.TokenRefresher do
+  @moduledoc false
+  alias Hilostory.Infrastructure.Hilo.AuthorizationClient
+  alias Hilostory.Infrastructure.OauthTokensRepository
   alias Hilostory.Joken.HiloToken
   alias Hilostory.Schema.OauthTokensSchema
-  alias Hilostory.Infrastructure.OauthTokensRepository
-  alias Hilostory.Infrastructure.Hilo.AuthorizationClient
 
-  def refresh() do
+  def refresh do
     with %OauthTokensSchema{} = tokens <- get_tokens(),
          :ok <- verify_refresh_token_valid(tokens),
          {:ok, refreshed_tokens} <-
            AuthorizationClient.refresh_access_token(tokens.refresh_token),
          refresh_token_expires_at =
-           HiloToken.calculate_refresh_token_expiration(refreshed_tokens.refresh_token_expires_in),
-         {:ok, tokens} <-
-           OauthTokensRepository.upsert(
-             refreshed_tokens.access_token,
-             refreshed_tokens.refresh_token,
-             refresh_token_expires_at
-           ) do
-      {:ok, tokens}
-    else
-      error -> error
+           HiloToken.calculate_refresh_token_expiration(refreshed_tokens.refresh_token_expires_in) do
+      OauthTokensRepository.upsert(
+        refreshed_tokens.access_token,
+        refreshed_tokens.refresh_token,
+        refresh_token_expires_at
+      )
     end
   end
 
-  def calculate_time_until_refresh() do
+  def calculate_time_until_refresh do
     with %OauthTokensSchema{} = tokens <- OauthTokensRepository.get(),
          :ok <- verify_refresh_token_valid(tokens),
          {:ok, claims} <- HiloToken.verify(tokens.access_token) do
@@ -51,7 +48,7 @@ defmodule Hilostory.TokenRefresher do
   end
 
   defp verify_refresh_token_valid(%OauthTokensSchema{} = tokens) do
-    if DateTime.compare(tokens.refresh_token_expires_at, DateTime.utc_now()) == :lt do
+    if DateTime.before?(tokens.refresh_token_expires_at, DateTime.utc_now()) do
       OauthTokensRepository.delete()
 
       {:error, :refresh_token_expired}
@@ -60,7 +57,7 @@ defmodule Hilostory.TokenRefresher do
     end
   end
 
-  defp get_tokens() do
+  defp get_tokens do
     case OauthTokensRepository.get() do
       nil -> {:error, :no_stored_tokens}
       tokens -> tokens

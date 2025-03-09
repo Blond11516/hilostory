@@ -1,9 +1,10 @@
 defmodule HilostoryWeb.Plugs.HiloAuthenticated do
+  @moduledoc false
+  @behaviour Plug
+
   require HilostoryWeb
 
   HilostoryWeb.verified_routes()
-
-  @behaviour Plug
 
   @impl true
   def init(options), do: options

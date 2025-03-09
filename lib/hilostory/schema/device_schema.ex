@@ -1,14 +1,15 @@
 defmodule Hilostory.Schema.DeviceSchema do
-  alias Hilostory.Schema.PowerSchema
-  alias Hilostory.Schema.TemperatureSchema
-  alias Hilostory.Schema.TargetTemperatureSchema
-  alias Hilostory.Schema.PairingStateSchema
-  alias Hilostory.Schema.HeatingSchema
-  alias Hilostory.Schema.GdStateSchema
-  alias Hilostory.Schema.DrmsStateSchema
-  alias Hilostory.Schema.ConnectionStateSchema
-
+  @moduledoc false
   use Ecto.Schema
+
+  alias Hilostory.Schema.ConnectionStateSchema
+  alias Hilostory.Schema.DrmsStateSchema
+  alias Hilostory.Schema.GdStateSchema
+  alias Hilostory.Schema.HeatingSchema
+  alias Hilostory.Schema.PairingStateSchema
+  alias Hilostory.Schema.PowerSchema
+  alias Hilostory.Schema.TargetTemperatureSchema
+  alias Hilostory.Schema.TemperatureSchema
 
   @primary_key {:id, :integer, []}
 

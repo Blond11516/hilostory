@@ -19,15 +19,14 @@ defmodule HilostoryWeb.ConnCase do
 
   using do
     quote do
+      use HilostoryWeb, :verified_routes
+      import HilostoryWeb.ConnCase
+      import Phoenix.ConnTest
+      import Plug.Conn
       # The default endpoint for testing
       @endpoint HilostoryWeb.Endpoint
 
-      use HilostoryWeb, :verified_routes
-
       # Import conveniences for testing with connections
-      import Plug.Conn
-      import Phoenix.ConnTest
-      import HilostoryWeb.ConnCase
     end
   end
 

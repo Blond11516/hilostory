@@ -1,11 +1,11 @@
 defmodule HilostoryWeb.AuthController do
   use HilostoryWeb, :controller
 
+  alias Hilostory.Infrastructure.Hilo.AuthorizationClient
+  alias Hilostory.Infrastructure.OauthTokensRepository
+  alias Hilostory.Joken.HiloToken
   alias Hilostory.TokenRefreshScheduler
   alias Hilostory.WebsocketStarter
-  alias Hilostory.Joken.HiloToken
-  alias Hilostory.Infrastructure.OauthTokensRepository
-  alias Hilostory.Infrastructure.Hilo.AuthorizationClient
 
   def login(conn, _params) do
     pkce_verifier = generate_pkce_verifier()
@@ -26,37 +26,38 @@ defmodule HilostoryWeb.AuthController do
   def callback(conn, params) do
     conn = conn |> fetch_session() |> fetch_flash()
 
-    with {:ok, authorization_code} <- Map.fetch(params, "code"),
-         {:ok, state} <- Map.fetch(params, "state"),
-         {conn, persisted_state} when is_binary(persisted_state) <-
-           get_and_delete_session(conn, :state),
-         {conn, pkce_verifier} when is_binary(pkce_verifier) <-
-           get_and_delete_session(conn, :pkce_verifier),
-         {conn, nonce} when is_binary(nonce) <- get_and_delete_session(conn, :nonce),
-         ^persisted_state <- state,
-         {:ok, tokens} =
-           AuthorizationClient.fetch_access_token(authorization_code, pkce_verifier),
-         :ok <- verify_nonce(tokens.id_token, nonce),
-         refresh_token_expires_at =
-           HiloToken.calculate_refresh_token_expiration(tokens.refresh_token_expires_in),
-         {:ok, _} <-
-           OauthTokensRepository.upsert(
-             tokens.access_token,
-             tokens.refresh_token,
-             refresh_token_expires_at
-           ),
-         {:ok, _} <- WebsocketStarter.start_websocket(),
-         :ok <- TokenRefreshScheduler.start_loop() do
-      conn
-    else
-      {:error, e} -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))
-      e -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))
-    end
-    |> redirect(to: ~p"/login")
+    conn =
+      with {:ok, authorization_code} <- Map.fetch(params, "code"),
+           {:ok, state} <- Map.fetch(params, "state"),
+           {conn, persisted_state} when is_binary(persisted_state) <-
+             get_and_delete_session(conn, :state),
+           {conn, pkce_verifier} when is_binary(pkce_verifier) <-
+             get_and_delete_session(conn, :pkce_verifier),
+           {conn, nonce} when is_binary(nonce) <- get_and_delete_session(conn, :nonce),
+           ^persisted_state <- state,
+           {:ok, tokens} =
+             AuthorizationClient.fetch_access_token(authorization_code, pkce_verifier),
+           :ok <- verify_nonce(tokens.id_token, nonce),
+           refresh_token_expires_at =
+             HiloToken.calculate_refresh_token_expiration(tokens.refresh_token_expires_in),
+           {:ok, _} <-
+             OauthTokensRepository.upsert(
+               tokens.access_token,
+               tokens.refresh_token,
+               refresh_token_expires_at
+             ),
+           {:ok, _} <- WebsocketStarter.start_websocket(),
+           :ok <- TokenRefreshScheduler.start_loop() do
+        conn
+      else
+        {:error, e} -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))
+        e -> put_flash(conn, :error, "Authentication failed: " <> inspect(e))
+      end
+
+    redirect(conn, to: ~p"/login")
   end
 
-  defp verify_nonce(id_token, expected_nonce)
-       when is_binary(id_token) and is_binary(expected_nonce) do
+  defp verify_nonce(id_token, expected_nonce) when is_binary(id_token) and is_binary(expected_nonce) do
     with {:ok, %{"nonce" => nonce}} <- HiloToken.verify_and_validate(id_token),
          ^expected_nonce <- nonce do
       :ok

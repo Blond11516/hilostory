@@ -1,4 +1,5 @@
 defmodule Hilostory.Infrastructure.OauthTokensRepository do
+  @moduledoc false
   alias Hilostory.Repo
   alias Hilostory.Schema.OauthTokensSchema
 
@@ -19,11 +20,11 @@ defmodule Hilostory.Infrastructure.OauthTokensRepository do
   end
 
   @spec get() :: OauthTokensSchema.t() | nil
-  def get() do
+  def get do
     Repo.one(OauthTokensSchema)
   end
 
-  def delete() do
+  def delete do
     Repo.delete_all(OauthTokensSchema)
   end
 end

@@ -1,4 +1,5 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.Device do
+  @moduledoc false
   use TypedStruct
 
   typedstruct enforce: true do

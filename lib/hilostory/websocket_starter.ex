@@ -1,10 +1,11 @@
 defmodule Hilostory.WebsocketStarter do
-  alias Hilostory.WebsocketSupervisor
+  @moduledoc false
+  use Task
+
   alias Hilostory.Infrastructure.Hilo.AutomationClient
   alias Hilostory.Infrastructure.OauthTokensRepository
   alias Hilostory.Schema.OauthTokensSchema
-
-  use Task
+  alias Hilostory.WebsocketSupervisor
 
   require Logger
 
@@ -12,7 +13,7 @@ defmodule Hilostory.WebsocketStarter do
     Task.start_link(__MODULE__, :start_websocket, [])
   end
 
-  def start_websocket() do
+  def start_websocket do
     Logger.info("Will attempt to start websocket.")
 
     with %OauthTokensSchema{} = tokens <- OauthTokensRepository.get(),

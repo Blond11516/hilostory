@@ -1,4 +1,5 @@
 defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
+  @moduledoc false
   require Logger
 
   @hilo_api_base_url URI.new!("https://api.hiloenergie.com")
@@ -12,9 +13,9 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
           (%{String.t() => term()} -> term())
         ) :: {:error, term()} | {:ok, Req.Response.t()}
   def get(api_path_prefix, endpoint, access_token, parse_body)
-      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and
-             is_function(parse_body) do
-    prepare_request(api_path_prefix, endpoint, access_token, parse_body)
+      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_function(parse_body) do
+    api_path_prefix
+    |> prepare_request(endpoint, access_token, parse_body)
     |> Req.get()
   end
 
@@ -25,9 +26,9 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
           (%{String.t() => term()} -> term())
         ) :: {:error, term()} | {:ok, Req.Response.t()}
   def post(api_path_prefix, endpoint, access_token, parse_body)
-      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and
-             is_function(parse_body) do
-    prepare_request(api_path_prefix, endpoint, access_token, parse_body)
+      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_function(parse_body) do
+    api_path_prefix
+    |> prepare_request(endpoint, access_token, parse_body)
     |> Req.post(body: "")
   end
 
@@ -38,20 +39,20 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
           (%{String.t() => term()} -> term())
         ) :: Req.Request.t()
   defp prepare_request(api_path_prefix, endpoint, access_token, parse_body)
-       when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and
-              is_function(parse_body) do
+       when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_function(parse_body) do
     uri = get_uri(api_path_prefix, endpoint)
 
     Logger.debug("Send GET request to #{uri}")
 
-    Req.new(
+    [
       url: uri,
       auth: {:bearer, access_token},
       headers: %{
         "content-type" => "application/json; charset=utf-8",
         "ocp-apim-subscription-key" => @subscription_key
       }
-    )
+    ]
+    |> Req.new()
     |> Req.Request.append_response_steps(
       parse_body: fn {request, response} ->
         parsed_body =
@@ -61,7 +62,7 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
             response.body
           end
 
-        {request, %Req.Response{response | body: parsed_body}}
+        {request, %{response | body: parsed_body}}
       end
     )
   end

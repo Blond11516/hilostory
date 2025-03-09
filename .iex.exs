@@ -5,14 +5,15 @@ case Application.ensure_loaded(:hilostory) do
   :ok ->
     {:ok, modules} = :application.get_key(:hilostory, :modules)
 
-    for module <- modules,
+    model_modules =
+      for module <- modules,
+          module
+          |> Atom.to_string()
+          |> String.starts_with?("Elixir.Hilostory.Infrastructure.Hilo.Models.") do
         module
-        |> Atom.to_string()
-        |> String.starts_with?("Elixir.Hilostory.Infrastructure.Hilo.Models.") do
-      module
-    end
-    |> Code.ensure_all_loaded!()
+      end
 
+    Code.ensure_all_loaded!(model_modules)
     import_file("./iex_helpers.exs")
 end
 
