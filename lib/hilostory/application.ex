@@ -16,7 +16,7 @@ defmodule Hilostory.Application do
         Hilostory.TokenRefreshScheduler,
         {Phoenix.PubSub, name: Hilostory.PubSub},
         Hilostory.Vault,
-        Hilostory.WebsocketSuperviser,
+        Hilostory.WebsocketSupervisor,
         Hilostory.WebsocketStarter,
         # Start a worker by calling: Hilostory.Worker.start_link(arg)
         # {Hilostory.Worker, arg},

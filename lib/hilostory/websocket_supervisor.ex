@@ -1,4 +1,4 @@
-defmodule Hilostory.WebsocketSuperviser do
+defmodule Hilostory.WebsocketSupervisor do
   use DynamicSupervisor
 
   alias Hilostory.Infrastructure.Hilo.WebsocketClient
