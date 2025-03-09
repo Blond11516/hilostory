@@ -32,7 +32,7 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "1.6.7"},
+      {:bandit, "1.6.8"},
       {:castore, "1.0.12"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
@@ -57,7 +57,7 @@ defmodule Hilostory.MixProject do
       {:tz, "0.28.1"},
       {:websockex, "0.4.3"},
       {:phoenix_live_reload, "1.5.3", only: :dev},
-      {:igniter, "0.5.29", only: :dev},
+      {:igniter, "0.5.32", only: :dev},
       {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
       {:floki, "0.37.0", only: :test}
     ]
