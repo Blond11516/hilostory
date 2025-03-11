@@ -7,3 +7,5 @@
 - gérer les messages avec type "complete"
 - gérer les messages avec target "GatewayValuesReceived"
 - trouver comment fetcher le jwks plus rapidement
+- setuper telemetry
+  - utiliser la telemetry pour tracker les erreurs de restart du client websocket au lieu du wrapper manuel
