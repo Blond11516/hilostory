@@ -25,13 +25,10 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   require Logger
 
   def start_link({tokens, connected_callback}) do
-    # try do
     Logger.info("Starting websocket client")
 
     connection_info = get_websocket_connection_info(tokens)
     Logger.info("Fetched websocket connection info")
-
-    raise "error"
 
     connection_id =
       get_connection_id(connection_info.url, connection_info.access_token)
@@ -51,11 +48,6 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
     Logger.info("Started websocket process")
     {:ok, websockex_pid}
-    # rescue
-    #   error ->
-    #     Logger.error("Failed to start WebsocketClient: #{inspect(error)}")
-    #     reraise error, __STACKTRACE__
-    # end
   end
 
   def subscribe_to_location(client, %Location{} = location) do
