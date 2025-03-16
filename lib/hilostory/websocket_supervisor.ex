@@ -14,12 +14,10 @@ defmodule Hilostory.WebsocketSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_websocket(tokens, location) do
-    connected_callback = fn -> WebsocketClient.subscribe_to_location(self(), location) end
-
+  def start_websocket do
     DynamicSupervisor.start_child(
       __MODULE__,
-      SupervisorChildStartErrorLogger.child_spec(WebsocketClient, {tokens, connected_callback})
+      SupervisorChildStartErrorLogger.child_spec(WebsocketClient, nil)
     )
   end
 end

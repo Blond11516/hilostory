@@ -12,7 +12,7 @@ defmodule Hilostory.Application do
       Hilostory.Repo,
       {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
       Hilostory.Joken.HiloStrategy,
-      Hilostory.TokenRefreshScheduler,
+      Hilostory.TokenManager,
       {Phoenix.PubSub, name: Hilostory.PubSub},
       Hilostory.Vault,
       Hilostory.WebsocketSupervisor,

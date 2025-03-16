@@ -13,6 +13,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.DeviceValue.Temperature
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Infrastructure.DeviceValueRepository
+  alias Hilostory.Infrastructure.Hilo.AutomationClient
   alias Hilostory.Infrastructure.Hilo.BaseApiClient
   alias Hilostory.Infrastructure.Hilo.Models
   alias Hilostory.Infrastructure.Hilo.Models.Location
@@ -21,38 +22,44 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesReceived
   alias Hilostory.Signalr.Message
+  alias Hilostory.TokenManager
 
   require Logger
 
-  def start_link({tokens, connected_callback}) do
+  def start_link(_) do
     Logger.info("Starting websocket client")
 
-    connection_info = get_websocket_connection_info(tokens)
-    Logger.info("Fetched websocket connection info")
+    with {:ok, tokens} <- TokenManager.get(),
+         {:ok, %{body: [location]}} <- AutomationClient.list_locations(tokens.access_token) do
+      Logger.info("Found Hilo credentials and fetched location, starting websocket")
 
-    connection_id =
-      get_connection_id(connection_info.url, connection_info.access_token)
+      connection_info = get_websocket_connection_info(tokens)
+      Logger.info("Fetched websocket connection info")
 
-    Logger.info("Fetched websocket connection id: #{connection_id}")
+      connection_id =
+        get_connection_id(connection_info.url, connection_info.access_token)
 
-    {:ok, websockex_pid} =
-      connection_info.url
-      |> URI.append_query(
-        URI.encode_query(%{
-          "id" => connection_id,
-          "access_token" => connection_info.access_token
-        })
-      )
-      |> URI.to_string()
-      |> WebSockex.start_link(__MODULE__, connected_callback)
+      Logger.info("Fetched websocket connection id: #{connection_id}")
 
-    Logger.info("Started websocket process")
-    {:ok, websockex_pid}
+      {:ok, websockex_pid} =
+        connection_info.url
+        |> URI.append_query(
+          URI.encode_query(%{
+            "id" => connection_id,
+            "access_token" => connection_info.access_token
+          })
+        )
+        |> URI.to_string()
+        |> WebSockex.start_link(__MODULE__, fn -> subscribe_to_location(location) end)
+
+      Logger.info("Started websocket process")
+      {:ok, websockex_pid}
+    end
   end
 
-  def subscribe_to_location(client, %Location{} = location) do
+  defp subscribe_to_location(%Location{} = location) do
     Logger.info("Subscribing to location #{location.id}")
-    WebSockex.cast(client, {:subscribe_to_location, location})
+    WebSockex.cast(self(), {:subscribe_to_location, location})
   end
 
   @impl true
