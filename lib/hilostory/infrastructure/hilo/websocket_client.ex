@@ -29,32 +29,33 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   def start_link(_) do
     Logger.info("Starting websocket client")
 
-    with {:ok, tokens} <- TokenManager.get(),
-         {:ok, %{body: [location]}} <- AutomationClient.list_locations(tokens.access_token) do
-      Logger.info("Found Hilo credentials and fetched location, starting websocket")
+    {:ok, tokens} = TokenManager.get()
+    Logger.info("Obtained the latest access token")
 
-      connection_info = get_websocket_connection_info(tokens)
-      Logger.info("Fetched websocket connection info")
+    {:ok, %{body: [location]}} = AutomationClient.list_locations(tokens.access_token)
+    Logger.info("Retrieved the Hilo location")
 
-      connection_id =
-        get_connection_id(connection_info.url, connection_info.access_token)
+    connection_info = get_websocket_connection_info(tokens)
+    Logger.info("Fetched websocket connection info")
 
-      Logger.info("Fetched websocket connection id: #{connection_id}")
+    connection_id =
+      get_connection_id(connection_info.url, connection_info.access_token)
 
-      {:ok, websockex_pid} =
-        connection_info.url
-        |> URI.append_query(
-          URI.encode_query(%{
-            "id" => connection_id,
-            "access_token" => connection_info.access_token
-          })
-        )
-        |> URI.to_string()
-        |> WebSockex.start_link(__MODULE__, fn -> subscribe_to_location(location) end)
+    Logger.info("Fetched websocket connection id: #{connection_id}")
 
-      Logger.info("Started websocket process")
-      {:ok, websockex_pid}
-    end
+    {:ok, websockex_pid} =
+      connection_info.url
+      |> URI.append_query(
+        URI.encode_query(%{
+          "id" => connection_id,
+          "access_token" => connection_info.access_token
+        })
+      )
+      |> URI.to_string()
+      |> WebSockex.start_link(__MODULE__, fn -> subscribe_to_location(location) end)
+
+    Logger.info("Started websocket process")
+    {:ok, websockex_pid}
   end
 
   defp subscribe_to_location(%Location{} = location) do
