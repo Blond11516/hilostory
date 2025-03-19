@@ -99,10 +99,10 @@ defmodule Hilostory.TokenManager do
   end
 
   defp verify_tokens(%OauthTokensSchema{} = tokens) do
-    with :ok <- verify_refresh_token_not_expired(tokens),
-         {:ok, claims} <- HiloToken.verify(tokens.access_token) do
-      {:ok, claims}
-    else
+    case verify_refresh_token_not_expired(tokens) do
+      :ok ->
+        HiloToken.verify(tokens.access_token)
+
       {:error, :refresh_token_expired} ->
         Logger.info("Refresh token has expired. Deleting it.")
         OauthTokensRepository.delete()
