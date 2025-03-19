@@ -6,23 +6,10 @@ defmodule Hilostory.Infrastructure.OauthTokensRepository do
   @spec upsert(String.t(), String.t(), DateTime.t()) :: :ok | {:error, Ecto.Changeset.t()}
   def upsert(access_token, refresh_token, %DateTime{} = refresh_token_expires_at)
       when is_binary(access_token) and is_binary(refresh_token) do
-    Repo.transaction(fn ->
-      case Repo.one(OauthTokensSchema) do
-        nil -> nil
-        _ -> delete()
-      end
-
-      new_schema = %OauthTokensSchema{
-        access_token: access_token,
-        refresh_token: refresh_token,
-        refresh_token_expires_at: refresh_token_expires_at
-      }
-
-      case Repo.insert(new_schema) do
-        {:ok, _token} -> :ok
-        {:error, changeset} -> {:error, changeset}
-      end
-    end)
+    case Repo.transaction(fn -> do_upsert(access_token, refresh_token, refresh_token_expires_at) end) do
+      {:ok, value} -> value
+      error -> error
+    end
   end
 
   @spec get() :: OauthTokensSchema.t() | nil
@@ -32,5 +19,25 @@ defmodule Hilostory.Infrastructure.OauthTokensRepository do
 
   def delete do
     Repo.delete_all(OauthTokensSchema)
+  end
+
+  @spec do_upsert(String.t(), String.t(), DateTime.t()) :: :ok | {:error, Ecto.Changeset.t()}
+  defp do_upsert(access_token, refresh_token, %DateTime{} = refresh_token_expires_at)
+       when is_binary(access_token) and is_binary(refresh_token) do
+    case Repo.one(OauthTokensSchema) do
+      nil -> nil
+      _ -> delete()
+    end
+
+    new_schema = %OauthTokensSchema{
+      access_token: access_token,
+      refresh_token: refresh_token,
+      refresh_token_expires_at: refresh_token_expires_at
+    }
+
+    case Repo.insert(new_schema) do
+      {:ok, _token} -> :ok
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 end

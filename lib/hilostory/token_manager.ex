@@ -98,7 +98,7 @@ defmodule Hilostory.TokenManager do
     )
   end
 
-  defp verify_tokens(%OauthTokensSchema{} = tokens) do
+  defp verify_tokens(tokens) do
     case verify_refresh_token_not_expired(tokens) do
       :ok ->
         HiloToken.verify(tokens.access_token)
@@ -110,7 +110,7 @@ defmodule Hilostory.TokenManager do
     end
   end
 
-  defp verify_refresh_token_not_expired(%OauthTokensSchema{} = tokens) do
+  defp verify_refresh_token_not_expired(tokens) do
     if DateTime.before?(tokens.refresh_token_expires_at, DateTime.utc_now()) do
       {:error, :refresh_token_expired}
     else
