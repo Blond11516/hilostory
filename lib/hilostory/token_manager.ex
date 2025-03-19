@@ -56,6 +56,9 @@ defmodule Hilostory.TokenManager do
       Logger.info("Access token refreshed. Will refresh again in #{refresh_in} seconds.")
 
       schedule_refresh(refresh_in)
+    else
+      error ->
+        Logger.error("Failed to refresh access token: #{inspect(error)}")
     end
 
     {:noreply, state}
@@ -86,6 +89,8 @@ defmodule Hilostory.TokenManager do
   end
 
   defp schedule_refresh(refresh_in) when is_integer(refresh_in) do
+    Logger.info("Scheduling access token refresh in #{refresh_in} seconds.")
+
     Process.send_after(
       self(),
       :refresh,
