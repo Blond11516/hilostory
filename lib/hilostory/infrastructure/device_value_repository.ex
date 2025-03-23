@@ -33,48 +33,62 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
 
   def insert(value, device_id)
       when is_integer(device_id) and
-             (is_struct(value, ConnectionState) or is_struct(value, PairingState) or is_struct(value, Temperature) or
-                is_struct(value, TargetTemperature) or is_struct(value, Heating) or is_struct(value, Power) or
+             (is_struct(value, ConnectionState) or is_struct(value, PairingState) or
+                is_struct(value, Temperature) or
+                is_struct(value, TargetTemperature) or is_struct(value, Heating) or
+                is_struct(value, Power) or
                 is_struct(value, GdState) or is_struct(value, DrmsState)) do
-    {schema, params, permitted} =
+    {schema, value_field_name, inner_value} =
       case value do
         %ConnectionState{} ->
-          {%ConnectionStateSchema{}, %{connected: value.connected?}, [:connected]}
+          {%ConnectionStateSchema{}, :connected, value.connected}
 
         %PairingState{} ->
-          {%PairingStateSchema{}, %{paired: value.paired?}, [:paired]}
+          {%PairingStateSchema{}, :paired, value.paired}
 
         %Temperature{} ->
-          {%TemperatureSchema{}, %{temperature: value.temperature}, [:temperature]}
+          {%TemperatureSchema{}, :temperature, value.temperature}
 
         %TargetTemperature{} ->
-          {%TargetTemperatureSchema{}, %{target_temperature: value.target_temperature}, [:target_temperature]}
+          {%TargetTemperatureSchema{}, :target_temperature, value.target_temperature}
 
         %Heating{} ->
-          {%HeatingSchema{}, %{heating: value.heating}, [:heating]}
+          {%HeatingSchema{}, :heating, value.heating}
 
         %Power{} ->
-          {%PowerSchema{}, %{power: value.power}, [:power]}
+          {%PowerSchema{}, :power, value.power}
 
         %GdState{} ->
-          {%GdStateSchema{}, %{state: value.state}, [:state]}
+          {%GdStateSchema{}, :state, value.state}
 
         %DrmsState{} ->
-          {%DrmsStateSchema{}, %{state: value.state}, [:state]}
+          {%DrmsStateSchema{}, :state, value.state}
       end
 
     schema
-    |> Changeset.cast(params, permitted)
+    |> Changeset.cast(%{value_field_name => inner_value}, [value_field_name])
     |> Changeset.cast(%{timestamp: value.timestamp, device_id: device_id}, [
       :timestamp,
       :device_id
     ])
-    |> Repo.insert(on_conflict: [set: [value: value]], conflict_target: :timestamp)
+    |> Repo.insert(
+      on_conflict: [set: [{value_field_name, inner_value}]],
+      conflict_target: :timestamp
+    )
   end
 
   @spec fetch(value_module(), integer(), {DateTime.t(), Datetime.t()}) :: struct()
   def fetch(value, device_id, period)
-      when value in [ConnectionState, PairingState, Temperature, TargetTemperature, Heating, Power, GdState, DrmsState] do
+      when value in [
+             ConnectionState,
+             PairingState,
+             Temperature,
+             TargetTemperature,
+             Heating,
+             Power,
+             GdState,
+             DrmsState
+           ] do
     value_schema =
       case value do
         ConnectionState -> ConnectionStateSchema
