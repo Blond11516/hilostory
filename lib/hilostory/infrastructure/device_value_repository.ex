@@ -69,7 +69,7 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
       :timestamp,
       :device_id
     ])
-    |> Repo.insert()
+    |> Repo.insert(on_conflict: [set: [value: value]], conflict_target: :timestamp)
   end
 
   @spec fetch(value_module(), integer(), {DateTime.t(), Datetime.t()}) :: struct()
