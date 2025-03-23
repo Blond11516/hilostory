@@ -44,12 +44,12 @@ defmodule Hilostory.TokenManager do
     Logger.info("Refreshing access token.")
 
     with {:ok, tokens, _claims} <- do_get(),
-         {:ok, refreshed_tokens, refresh_token_expires_at} <- TokenRefresher.refresh(tokens),
+         {:ok, refreshed_tokens} <- TokenRefresher.refresh(tokens),
          :ok <-
            OauthTokensRepository.upsert(
              refreshed_tokens.access_token,
              refreshed_tokens.refresh_token,
-             refresh_token_expires_at
+             refreshed_tokens.refresh_token_expires_at
            ) do
       claims = verify_tokens(refreshed_tokens)
       refresh_in = TokenRefresher.calculate_time_until_refresh(claims)
@@ -98,7 +98,7 @@ defmodule Hilostory.TokenManager do
     )
   end
 
-  defp verify_tokens(tokens) do
+  defp verify_tokens(%OauthTokensSchema{} = tokens) do
     case verify_refresh_token_not_expired(tokens) do
       :ok ->
         HiloToken.verify(tokens.access_token)
@@ -110,8 +110,8 @@ defmodule Hilostory.TokenManager do
     end
   end
 
-  defp verify_refresh_token_not_expired(tokens) do
-    if DateTime.before?(tokens.refresh_token_expires_at, DateTime.utc_now()) do
+  defp verify_refresh_token_not_expired(%{refresh_token_expires_at: refresh_token_expires_at}) do
+    if DateTime.before?(refresh_token_expires_at, DateTime.utc_now()) do
       {:error, :refresh_token_expired}
     else
       :ok
@@ -124,6 +124,7 @@ defmodule Hilostory.TokenManager do
       {:ok, tokens, claims}
     else
       nil -> {:error, :no_stored_token}
+      error -> error
     end
   end
 end

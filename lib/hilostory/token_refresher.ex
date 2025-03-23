@@ -4,13 +4,19 @@ defmodule Hilostory.TokenRefresher do
   alias Hilostory.Joken.HiloToken
   alias Hilostory.Schema.OauthTokensSchema
 
+  @spec refresh(OauthTokensSchema.t()) :: {:ok, OauthTokensSchema.t()} | {:error, Exception.t()}
   def refresh(%OauthTokensSchema{} = tokens) do
     with {:ok, refreshed_tokens} <-
            AuthorizationClient.refresh_access_token(tokens.refresh_token) do
       refresh_token_expires_at =
         HiloToken.calculate_refresh_token_expiration(refreshed_tokens.refresh_token_expires_in)
 
-      {:ok, refreshed_tokens, refresh_token_expires_at}
+      {:ok,
+       %OauthTokensSchema{
+         access_token: refreshed_tokens.access_token,
+         refresh_token: refreshed_tokens.refresh_token,
+         refresh_token_expires_at: refresh_token_expires_at
+       }}
     end
   end
 

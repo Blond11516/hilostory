@@ -40,7 +40,7 @@ defmodule HilostoryWeb.AuthController do
            :ok <- verify_nonce(tokens.id_token, nonce),
            refresh_token_expires_at =
              HiloToken.calculate_refresh_token_expiration(tokens.refresh_token_expires_in),
-           {:ok, _} <-
+           :ok <-
              OauthTokensRepository.upsert(
                tokens.access_token,
                tokens.refresh_token,
