@@ -15,9 +15,9 @@ config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 config :esbuild,
   version: "0.25.11",
   hilostory: [
-    args: ~w(ts/app.ts --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+    args: ~w(ts/app.ts --bundle --target=es2022 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --alias:@=.),
     cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+    env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
 
 # Configures the endpoint

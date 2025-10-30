@@ -9,7 +9,9 @@ defmodule Hilostory.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      compilers: [:phoenix_live_view] ++ Mix.compilers(),
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -32,35 +34,35 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "1.6.9"},
-      {:castore, "1.0.12"},
+      {:bandit, "1.8.0"},
+      {:castore, "1.0.15"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
-      {:ecto_sql, "3.12.1"},
-      {:esbuild, "0.9.0", runtime: Mix.env() == :dev},
-      {:finch, "0.19.0"},
+      {:ecto_sql, "3.13.2"},
+      {:esbuild, "0.10.0", runtime: Mix.env() == :dev},
+      {:finch, "0.20.0"},
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
-      {:phoenix, "1.7.20"},
-      {:phoenix_ecto, "4.6.3"},
-      {:phoenix_html, "4.2.1"},
-      {:phoenix_live_dashboard, "0.8.6"},
-      {:phoenix_live_view, "1.0.7"},
-      {:postgrex, "0.20.0"},
-      {:recase, "0.8.1"},
-      {:req, "0.5.8"},
+      {:phoenix, "1.8.1"},
+      {:phoenix_ecto, "4.6.5"},
+      {:phoenix_html, "4.3.0"},
+      {:phoenix_live_dashboard, "0.8.7"},
+      {:phoenix_live_view, "1.1.16"},
+      {:postgrex, "0.21.1"},
+      {:recase, "0.9.1"},
+      {:req, "0.5.15"},
       {:telemetry_metrics, "1.1.0"},
-      {:telemetry_poller, "1.1.0"},
-      {:tower_sentry, "0.3.3"},
+      {:telemetry_poller, "1.3.0"},
+      {:tower_sentry, "0.3.5"},
       {:timescale, "0.1.1"},
       {:typed_struct, "0.3.0"},
       {:tz, "0.28.1"},
       {:websockex, "0.4.3"},
-      {:phoenix_live_reload, "1.5.3", only: :dev},
-      {:igniter, "0.5.38", only: :dev},
-      {:styler, "1.4.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "1.4.5", only: [:dev, :test], runtime: false},
-      {:floki, "0.37.1", only: :test}
+      {:phoenix_live_reload, "1.6.1", only: :dev},
+      {:igniter, "0.6.30", only: :dev},
+      {:styler, "1.9.1", only: [:dev, :test], runtime: false},
+      {:dialyxir, "1.4.6", only: [:dev, :test], runtime: false},
+      {:lazy_html, "0.1.8", only: :test}
     ]
   end
 

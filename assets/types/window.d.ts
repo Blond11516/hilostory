@@ -1,7 +1,9 @@
-import { LiveSocket } from "phoenix_live_view";
+import type LiveSocket from "phoenix_live_view";
 
 declare global {
-  interface Window {
-    liveSocket: LiveSocket;
-  }
+	interface Window {
+		// biome-ignore lint/suspicious/noExplicitAny: Don't have a type definition for Phoenix's reloader
+		liveReloader: any;
+		liveSocket: LiveSocket;
+	}
 }

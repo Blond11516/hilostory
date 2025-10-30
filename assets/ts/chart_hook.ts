@@ -1,4 +1,4 @@
-import type { ViewHook } from "phoenix_live_view";
+import { ViewHook } from "phoenix_live_view";
 import uPlot from "uplot";
 
 type DeviceDataPoint = {
@@ -11,8 +11,10 @@ type DeviceData = Record<number, DeviceDataPoint>
 
 const sync = uPlot.sync("chartsSync")
 
-const Chart: ViewHook<{ chart?: uPlot}> = {
-	mounted() {
+class Chart extends ViewHook {
+  private chart?: uPlot
+  
+	override mounted() {
 		const deviceName = this.el.getAttribute("data-device-name")!
 		const chartContainer = document.getElementById("chart-" + deviceName)!
 		const data = parseDeviceData(this.el)
@@ -74,19 +76,21 @@ const Chart: ViewHook<{ chart?: uPlot}> = {
 		const plot = new uPlot(opts, data, chartContainer);
 		this.chart = plot
 		sync.sub(plot)
-	},
-	updated() {
+	}
+	
+	override updated() {
 		const data: [number[], ...(number | null)[][]] = parseDeviceData(this.el);
 
 		if (this.chart) {
 			this.chart.setData(data)
 		}
-	},
-	destroyed() {
+	}
+	
+	override destroyed() {
 		if (this.chart) {
 			sync.unsub(this.chart)
 		}
-	},
+	}
 }
 
 export default Chart
@@ -94,7 +98,7 @@ export default Chart
 function parseDeviceData(element: HTMLElement): [number[], ...(number | null)[][]] {
 	const rawData = element.getAttribute('data-data')!;
 	const parsedData = JSON.parse(rawData) as DeviceData;
-	const sortedPowerData = Object.entries(parsedData).toSorted((a, b) => Number.parseInt(a[0]) - Number.parseInt(b[0]));
+	const sortedPowerData = [...Object.entries(parsedData)].sort((a, b) => Number.parseInt(a[0]) - Number.parseInt(b[0]));
 	const timestamps = sortedPowerData.map(it => Number.parseInt(it[0]));
 	const powers = sortedPowerData.map(it => it[1].power);
 	const temperatures = sortedPowerData.map(it => it[1].temperature);
