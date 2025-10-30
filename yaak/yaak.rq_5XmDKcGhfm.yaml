@@ -1,0 +1,22 @@
+type: http_request
+model: http_request
+id: rq_5XmDKcGhfm
+createdAt: 2025-10-30T01:51:09.951343792
+updatedAt: 2025-10-30T01:51:37.551240910
+workspaceId: wk_AoKEGnLnSw
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: ''
+  value: ''
+  id: PAPPpdjUtm
+method: POST
+name: List locations
+sortPriority: -1761788148688.999
+url: ${[ HILO_BASE_URL ]}/DeviceHub/negotiate
+urlParameters: []

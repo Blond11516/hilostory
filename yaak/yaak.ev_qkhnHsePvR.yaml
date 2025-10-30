@@ -1,0 +1,21 @@
+type: environment
+model: environment
+id: ev_qkhnHsePvR
+workspaceId: wk_AoKEGnLnSw
+createdAt: 2025-10-30T01:35:02.234442566
+updatedAt: 2025-10-30T01:50:58.712394056
+name: Global Variables
+public: true
+base: true
+parentModel: workspace
+parentId: null
+variables:
+- enabled: true
+  name: HILO_OAUTH_BASE_URL
+  value: https://connexion.hiloenergie.com/hilodirectoryb2c.onmicrosoft.com/B2C_1A_SIGN_IN/oauth2/v2.0
+  id: YdBwt9yV8T
+- enabled: true
+  name: HILO_BASE_URL
+  value: https://api.hiloenergie.com
+  id: Xt2IFtRugM
+color: null

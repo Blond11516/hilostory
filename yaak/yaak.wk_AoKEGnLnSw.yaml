@@ -1,0 +1,28 @@
+type: workspace
+model: workspace
+id: wk_AoKEGnLnSw
+createdAt: 2025-10-30T01:35:01.835288341
+updatedAt: 2025-10-30T01:45:42.538431954
+authentication:
+  accessTokenUrl: ${[ HILO_OAUTH_BASE_URL ]}/token
+  authorizationUrl: ${[ HILO_OAUTH_BASE_URL ]}/authorize
+  clientId: 1ca9f585-4a55-4085-8e30-9746a65fa561
+  redirectUri: https://my.home-assistant.io/redirect/oauth
+  scope: openid https://HiloDirectoryB2C.onmicrosoft.com/hiloapis/user_impersonation offline_access
+  usePkce: true
+authenticationType: oauth2
+description: ''
+headers:
+- enabled: true
+  name: ocp-apim-subscription-key
+  value: 20eeaedcb86945afa3fe792cea89b8bf
+  id: ZHwPcHIzdv
+- enabled: true
+  name: ''
+  value: ''
+  id: p2wRVE4Yce
+name: Hilostory
+encryptionKeyChallenge: null
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0

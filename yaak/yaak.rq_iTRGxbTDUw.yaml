@@ -1,0 +1,22 @@
+type: http_request
+model: http_request
+id: rq_iTRGxbTDUw
+createdAt: 2025-10-30T01:35:48.693227346
+updatedAt: 2025-10-30T01:51:06.824808017
+workspaceId: wk_AoKEGnLnSw
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: ''
+  value: ''
+  id: PAPPpdjUtm
+method: GET
+name: List locations
+sortPriority: -1761788148689.0
+url: ${[ HILO_BASE_URL ]}/Automation/v1/api/Locations
+urlParameters: []
