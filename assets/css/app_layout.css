@@ -4,14 +4,16 @@
 */
 
 :root {
-	--brand: #FD4F00;
+	--brand: #fd4f00;
 
-	font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	font-family:
+		ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+		"Segoe UI Symbol", "Noto Color Emoji";
 }
 
 a {
-  color: inherit;
-  text-decoration: inherit;
+	color: inherit;
+	text-decoration: inherit;
 }
 
 header {
@@ -32,7 +34,7 @@ header {
 			display: flex;
 			align-items: center;
 			gap: 16px;
-			
+
 			& p {
 				background-color: color-mix(in srgb, var(--brand) 5%, transparent);
 				color: var(--brand);

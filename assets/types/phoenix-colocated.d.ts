@@ -1,5 +1,5 @@
 declare module "phoenix-colocated/hilostory" {
-  import type { HooksOptions } from "phoenix_live_view";
+	import type { HooksOptions } from "phoenix_live_view";
 
-  export const hooks: HooksOptions;
+	export const hooks: HooksOptions;
 }

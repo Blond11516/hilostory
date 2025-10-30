@@ -24,8 +24,8 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/hilostory";
 import topbar from "topbar";
-import "../css/app.css"
-import "uplot/dist/uPlot.min.css"
+import "../css/app.css";
+import "uplot/dist/uPlot.min.css";
 import Chart from "./chart_hook";
 import PushTimeZone from "./push_time_zone_hook";
 
@@ -37,8 +37,8 @@ const liveSocket = new LiveSocket("/live", Socket, {
 	longPollFallbackMs: 2500,
 	params: { _csrf_token: csrfToken },
 	hooks: {
-  	Chart,
-  	PushTimeZone,
+		Chart,
+		PushTimeZone,
 		...colocatedHooks,
 	},
 });
