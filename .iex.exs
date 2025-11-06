@@ -14,7 +14,8 @@ case Application.ensure_loaded(:hilostory) do
       end
 
     Code.ensure_all_loaded!(model_modules)
-    import_file("./iex_helpers.exs")
+    import_file("./iex/iex_helpers.exs")
+    import_file("./iex/zoi_json_codegen.exs")
 end
 
 import_if_available(IexHelpers)
