@@ -1,22 +1,25 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived do
   @moduledoc false
-  use TypedStruct
 
-  typedstruct enforce: true do
-    field :category, String.t()
-    field :e_tag, String.t()
-    field :external_group, String.t()
-    field :group_id, integer(), enforce: false
-    field :hilo_id, String.t()
-    field :id, integer()
-    field :identifier, String.t()
-    field :is_favorite, boolean()
-    field :model_number, String.t()
-    field :name, String.t()
-    field :provider, integer()
-    field :settable_attributes_list, list(String.t())
-    field :supported_attributes_list, list(String.t())
-    field :supported_parameters_list, list(String.t())
-    field :type, String.t()
-  end
+  @schema Zoi.object(%{
+            "category" => Zoi.string(),
+            "eTag" => Zoi.string(),
+            "externalGroup" => Zoi.string(),
+            "groupId" => Zoi.optional(Zoi.integer()),
+            "hiloId" => Zoi.string(),
+            "id" => Zoi.integer(),
+            "identifier" => Zoi.string(),
+            "isFavorite" => Zoi.boolean(),
+            "modelNumber" => Zoi.string(),
+            "name" => Zoi.string(),
+            "provider" => Zoi.integer(),
+            "settableAttributesList" => Zoi.array(Zoi.string()),
+            "supportedAttributesList" => Zoi.array(Zoi.string()),
+            "supportedParametersList" => Zoi.array(Zoi.string()),
+            "type" => Zoi.string()
+          })
+
+  # @type t :: unquote(Zoi.type_spec(@schema))
+
+  def schema, do: @schema
 end

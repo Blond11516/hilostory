@@ -10,12 +10,12 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
           nonempty_binary(),
           nonempty_binary(),
           nonempty_binary(),
-          (%{String.t() => term()} -> term())
+          module()
         ) :: {:error, term()} | {:ok, Req.Response.t()}
-  def get(api_path_prefix, endpoint, access_token, parse_body)
-      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_function(parse_body) do
+  def get(api_path_prefix, endpoint, access_token, model_module)
+      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_atom(model_module) do
     api_path_prefix
-    |> prepare_request(endpoint, access_token, parse_body)
+    |> prepare_request(endpoint, access_token, model_module)
     |> Req.get()
   end
 
@@ -23,12 +23,12 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
           nonempty_binary(),
           nonempty_binary(),
           nonempty_binary(),
-          (%{String.t() => term()} -> term())
+          module()
         ) :: {:error, term()} | {:ok, Req.Response.t()}
-  def post(api_path_prefix, endpoint, access_token, parse_body)
-      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_function(parse_body) do
+  def post(api_path_prefix, endpoint, access_token, model_module)
+      when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_atom(model_module) do
     api_path_prefix
-    |> prepare_request(endpoint, access_token, parse_body)
+    |> prepare_request(endpoint, access_token, model_module)
     |> Req.post(body: "")
   end
 
@@ -36,10 +36,10 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
           nonempty_binary(),
           nonempty_binary(),
           nonempty_binary(),
-          (%{String.t() => term()} -> term())
+          module()
         ) :: Req.Request.t()
-  defp prepare_request(api_path_prefix, endpoint, access_token, parse_body)
-       when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_function(parse_body) do
+  defp prepare_request(api_path_prefix, endpoint, access_token, model_module)
+       when is_binary(api_path_prefix) and is_binary(endpoint) and is_binary(access_token) and is_atom(model_module) do
     uri = get_uri(api_path_prefix, endpoint)
 
     Logger.debug("Send GET request to #{uri}")
@@ -57,7 +57,10 @@ defmodule Hilostory.Infrastructure.Hilo.BaseApiClient do
       parse_body: fn {request, response} ->
         parsed_body =
           if response.status == 200 do
-            parse_body.(response.body)
+            case response.body do
+              body when is_list(body) -> Enum.map(body, &Zoi.parse!(model_module.schema(), &1))
+              body -> Zoi.parse!(model_module.schema(), body)
+            end
           else
             response.body
           end

@@ -20,6 +20,7 @@ defmodule HilostoryWeb.ConnCase do
   using do
     quote do
       use HilostoryWeb, :verified_routes
+
       import HilostoryWeb.ConnCase
       import Phoenix.ConnTest
       import Plug.Conn

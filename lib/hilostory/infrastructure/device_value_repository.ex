@@ -33,10 +33,8 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
 
   def insert(value, device_id)
       when is_integer(device_id) and
-             (is_struct(value, ConnectionState) or is_struct(value, PairingState) or
-                is_struct(value, Temperature) or
-                is_struct(value, TargetTemperature) or is_struct(value, Heating) or
-                is_struct(value, Power) or
+             (is_struct(value, ConnectionState) or is_struct(value, PairingState) or is_struct(value, Temperature) or
+                is_struct(value, TargetTemperature) or is_struct(value, Heating) or is_struct(value, Power) or
                 is_struct(value, GdState) or is_struct(value, DrmsState)) do
     {schema, value_field_name, inner_value} =
       case value do
@@ -79,16 +77,7 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
 
   @spec fetch(value_module(), integer(), {DateTime.t(), Datetime.t()}) :: struct()
   def fetch(value, device_id, period)
-      when value in [
-             ConnectionState,
-             PairingState,
-             Temperature,
-             TargetTemperature,
-             Heating,
-             Power,
-             GdState,
-             DrmsState
-           ] do
+      when value in [ConnectionState, PairingState, Temperature, TargetTemperature, Heating, Power, GdState, DrmsState] do
     value_schema =
       case value do
         ConnectionState -> ConnectionStateSchema

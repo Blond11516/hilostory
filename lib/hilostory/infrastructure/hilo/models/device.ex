@@ -1,32 +1,35 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.Device do
   @moduledoc false
-  use TypedStruct
 
-  typedstruct enforce: true do
-    field :asset_id, String.t()
-    field :category, String.t()
-    field :e_tag, String.t()
-    field :external_group, String.t()
-    field :gateway_asset_id, nil
-    field :gateway_external_id, String.t()
-    field :gateway_id, integer()
-    field :group_id, integer()
-    field :hilo_id, String.t()
-    field :icon, nil
-    field :id, integer()
-    field :identifier, String.t()
-    field :is_favorite, boolean()
-    field :load_connected, nil
-    field :location_id, integer()
-    field :model_number, String.t()
-    field :name, String.t()
-    field :parameters, nil
-    field :provider, integer()
-    field :provider_data, nil | %{String.t() => String.t()}
-    field :settable_attributes, String.t()
-    field :settable_attributes_list, list(String.t())
-    field :supported_parameters, String.t()
-    field :supported_parameters_list, list(String.t())
-    field :type, String.t()
-  end
+  @schema Zoi.object(%{
+            "assetId" => Zoi.string(),
+            "category" => Zoi.string(),
+            "eTag" => Zoi.string(),
+            "externalGroup" => Zoi.string(),
+            "gatewayAssetId" => Zoi.null(),
+            "gatewayExternalId" => Zoi.string(),
+            "gatewayId" => Zoi.integer(),
+            "groupId" => Zoi.integer(),
+            "hiloId" => Zoi.string(),
+            "icon" => Zoi.null(),
+            "id" => Zoi.integer(),
+            "identifier" => Zoi.string(),
+            "isFavorite" => Zoi.boolean(),
+            "loadConnected" => Zoi.null(),
+            "locationId" => Zoi.integer(),
+            "modelNumber" => Zoi.string(),
+            "name" => Zoi.string(),
+            "parameters" => Zoi.null(),
+            "provider" => Zoi.integer(),
+            "providerData" => Zoi.string() |> Zoi.transform(&JSON.decode!/1) |> Zoi.nullable(),
+            "settableAttributes" => Zoi.string(),
+            "settableAttributesList" => Zoi.array(Zoi.string()),
+            "supportedParameters" => Zoi.string(),
+            "supportedParametersList" => Zoi.array(Zoi.string()),
+            "type" => Zoi.string()
+          })
+
+  # @type t :: unquote(Zoi.type_spec(@schema))
+
+  def schema, do: @schema
 end

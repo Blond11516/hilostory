@@ -1,0 +1,30 @@
+type: http_request
+model: http_request
+id: rq_Uigbyp4GH2
+createdAt: 2025-10-30T02:57:25.615873664
+updatedAt: 2025-10-30T02:57:54.381303335
+workspaceId: wk_AoKEGnLnSw
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: ''
+  value: ''
+  id: PAPPpdjUtm
+method: GET
+name: List devices
+sortPriority: -1761788148688.999
+url: ${[ HILO_BASE_URL ]}/Automation/v1/api/Locations/:locationId/Devices
+urlParameters:
+- enabled: true
+  name: :locationId
+  value: '56059'
+  id: AIg7f4F5T3
+- enabled: true
+  name: ''
+  value: ''
+  id: jFmYgf8r4g

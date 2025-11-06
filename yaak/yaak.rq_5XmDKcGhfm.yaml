@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_5XmDKcGhfm
 createdAt: 2025-10-30T01:51:09.951343792
-updatedAt: 2025-10-30T01:51:37.551240910
+updatedAt: 2025-10-30T02:31:03.449872464
 workspaceId: wk_AoKEGnLnSw
 folderId: null
 authentication: {}
@@ -16,7 +16,7 @@ headers:
   value: ''
   id: PAPPpdjUtm
 method: POST
-name: List locations
+name: Negotiate device subscription
 sortPriority: -1761788148688.999
 url: ${[ HILO_BASE_URL ]}/DeviceHub/negotiate
 urlParameters: []

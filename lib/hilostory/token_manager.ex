@@ -51,7 +51,7 @@ defmodule Hilostory.TokenManager do
              refreshed_tokens.refresh_token,
              refreshed_tokens.refresh_token_expires_at
            ) do
-      claims = verify_tokens(refreshed_tokens)
+      {:ok, claims} = verify_tokens(refreshed_tokens)
       refresh_in = TokenRefresher.calculate_time_until_refresh(claims)
       Logger.info("Access token refreshed. Will refresh again in #{refresh_in} seconds.")
 

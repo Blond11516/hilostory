@@ -1,7 +1,6 @@
 defmodule Hilostory.Infrastructure.Hilo.AutomationClient do
   @moduledoc false
   alias Hilostory.Infrastructure.Hilo.BaseApiClient
-  alias Hilostory.Infrastructure.Hilo.Models
   alias Hilostory.Infrastructure.Hilo.Models.Device
   alias Hilostory.Infrastructure.Hilo.Models.Location
 
@@ -15,16 +14,7 @@ defmodule Hilostory.Infrastructure.Hilo.AutomationClient do
       @path_prefix,
       "/Locations/#{location_id}/Devices",
       access_token,
-      &Models.parse(
-        &1,
-        Device,
-        %{
-          provider_data: fn
-            nil -> nil
-            raw_data -> Jason.decode!(raw_data)
-          end
-        }
-      )
+      Device
     )
   end
 
@@ -34,16 +24,7 @@ defmodule Hilostory.Infrastructure.Hilo.AutomationClient do
       @path_prefix,
       "/Locations",
       access_token,
-      &Models.parse(
-        &1,
-        Location,
-        %{
-          created_utc: fn iso_date_time ->
-            {:ok, date_time, 0} = DateTime.from_iso8601(iso_date_time)
-            date_time
-          end
-        }
-      )
+      Location
     )
   end
 end

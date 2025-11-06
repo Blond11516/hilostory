@@ -1,15 +1,18 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.GatewayValuesReceived do
   @moduledoc false
-  use TypedStruct
 
-  typedstruct enforce: true do
-    field :attribute, String.t()
-    field :device_id, integer()
-    field :hilo_id, String.t()
-    field :location_hilo_id, String.t()
-    field :location_id, integer()
-    field :time_stamp_utc, DateTime.t()
-    field :value, integer() | float() | String.t() | boolean() | list()
-    field :value_type, String.t(), enforce: false
-  end
+  @schema Zoi.object(%{
+            "attribute" => Zoi.string(),
+            "deviceId" => Zoi.integer(),
+            "hiloId" => Zoi.string(),
+            "locationHiloId" => Zoi.string(),
+            "locationId" => Zoi.integer(),
+            "timeStampUtc" => Zoi.ISO.datetime(),
+            "value" => Zoi.union([Zoi.integer(), Zoi.float(), Zoi.string(), Zoi.boolean(), Zoi.array()]),
+            "valueType" => Zoi.nullable(Zoi.string())
+          })
+
+  # @type t :: unquote(Zoi.type_spec(@schema))
+
+  def schema, do: @schema
 end

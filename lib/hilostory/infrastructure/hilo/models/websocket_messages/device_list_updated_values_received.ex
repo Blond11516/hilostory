@@ -1,12 +1,15 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived do
   @moduledoc false
-  use TypedStruct
 
-  typedstruct enforce: true do
-    field :category, String.t()
-    field :group_id, integer(), enforce: false
-    field :hilo_id, String.t()
-    field :id, integer()
-    field :name, String.t()
-  end
+  @schema Zoi.object(%{
+            "category" => Zoi.string(),
+            "groupId" => Zoi.nullable(Zoi.integer()),
+            "hiloId" => Zoi.string(),
+            "id" => Zoi.integer(),
+            "name" => Zoi.string()
+          })
+
+  # @type t :: unquote(Zoi.type_spec(@schema))
+
+  def schema, do: @schema
 end

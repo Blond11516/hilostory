@@ -15,8 +15,6 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   alias Hilostory.Infrastructure.DeviceValueRepository
   alias Hilostory.Infrastructure.Hilo.AutomationClient
   alias Hilostory.Infrastructure.Hilo.BaseApiClient
-  alias Hilostory.Infrastructure.Hilo.Models
-  alias Hilostory.Infrastructure.Hilo.Models.Location
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListInitialValuesReceived
   alias Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListUpdatedValuesReceived
@@ -39,16 +37,16 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     Logger.info("Fetched websocket connection info")
 
     connection_id =
-      get_connection_id(connection_info.url, connection_info.access_token)
+      get_connection_id(connection_info["url"], connection_info["accessToken"])
 
     Logger.info("Fetched websocket connection id: #{connection_id}")
 
     {:ok, websockex_pid} =
-      connection_info.url
+      connection_info["url"]
       |> URI.append_query(
         URI.encode_query(%{
           "id" => connection_id,
-          "access_token" => connection_info.access_token
+          "access_token" => connection_info["accessToken"]
         })
       )
       |> URI.to_string()
@@ -58,8 +56,8 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     {:ok, websockex_pid}
   end
 
-  defp subscribe_to_location(%Location{} = location) do
-    Logger.info("Subscribing to location #{location.id}")
+  defp subscribe_to_location(location) do
+    Logger.info("Subscribing to location #{location["id"]}")
     WebSockex.cast(self(), {:subscribe_to_location, location})
   end
 
@@ -86,13 +84,13 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
     subsrciption_frame =
       {:text,
        Jason.encode!(%{
-         "arguments" => [location.id],
+         "arguments" => [location["id"]],
          "invocationId" => "0",
          "target" => "SubscribeToLocation",
          "type" => 1
        })}
 
-    Logger.debug("Sending websocket frame to subscribe to location #{location.id}: #{inspect(subsrciption_frame)}")
+    Logger.debug("Sending websocket frame to subscribe to location #{location["id"]}: #{inspect(subsrciption_frame)}")
 
     {:reply, subsrciption_frame, state}
   end
@@ -162,11 +160,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
         "/DeviceHub",
         "/negotiate",
         access_token,
-        &Models.parse(
-          &1,
-          WebsocketConnectionInfo,
-          %{url: fn raw_url -> URI.new!(raw_url) end}
-        )
+        WebsocketConnectionInfo
       )
 
     resp.body
@@ -185,13 +179,13 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
       message.arguments
       |> hd()
-      |> Models.parse(DeviceListInitialValuesReceived)
-      |> Enum.each(fn %DeviceListInitialValuesReceived{} = device ->
+      |> Enum.map(&Zoi.parse!(DeviceListInitialValuesReceived.schema(), &1))
+      |> Enum.each(fn device ->
         device = %Device{
-          id: device.id,
-          hilo_id: device.hilo_id,
-          name: device.name,
-          type: device.type
+          id: device["id"],
+          hilo_id: device["hiloId"],
+          name: device["name"],
+          type: device["type"]
         }
 
         device
@@ -217,14 +211,14 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
       message.arguments
       |> hd()
-      |> Models.parse(DeviceListUpdatedValuesReceived)
-      |> Enum.each(fn %DeviceListUpdatedValuesReceived{} = device ->
-        case DeviceRepository.update(device.id, device.name) do
+      |> Enum.map(&Zoi.parse!(DeviceListUpdatedValuesReceived.schema(), &1))
+      |> Enum.each(fn device ->
+        case DeviceRepository.update(device["id"], device["name"]) do
           {:ok, _} ->
-            Logger.info("Successfully updated device #{device.id}")
+            Logger.info("Successfully updated device #{device["id"]}")
 
           {:error, error} ->
-            Logger.error("Failed to update device #{device.id}: #{inspect(error)}")
+            Logger.error("Failed to update device #{device["id"]}: #{inspect(error)}")
         end
       end)
 
@@ -240,12 +234,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
       message.arguments
       |> hd()
-      |> Models.parse(DeviceValuesReceived, %{
-        time_stamp_utc: fn iso_date_time ->
-          {:ok, date_time, 0} = DateTime.from_iso8601(iso_date_time)
-          date_time
-        end
-      })
+      |> Enum.map(&Zoi.parse!(DeviceValuesReceived.schema(), &1))
       |> Enum.each(fn value ->
         parsed_value =
           case value.attribute do

@@ -1,19 +1,34 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.Location do
   @moduledoc false
-  use TypedStruct
 
-  typedstruct enforce: true do
-    field :address_id, String.t()
-    field :country_code, String.t()
-    field :created_utc, DateTime.t()
-    field :energy_cost_configured, boolean()
-    field :gateway_count, integer()
-    field :id, integer()
-    field :location_hilo_id, String.t()
-    field :name, String.t()
-    field :postal_code, String.t()
-    field :temperature_format, String.t()
-    field :time_format, String.t()
-    field :time_zone, String.t()
-  end
+  @schema Zoi.object(%{
+            "addressId" => Zoi.string(),
+            "countryCode" => Zoi.string(),
+            "createdUtc" => Zoi.ISO.datetime(),
+            "energyCostConfigured" => Zoi.boolean(),
+            "gatewayCount" => Zoi.integer(),
+            "id" => Zoi.integer(),
+            "locationHiloId" => Zoi.string(),
+            "name" => Zoi.string(),
+            "postalCode" => Zoi.string(),
+            "temperatureFormat" => Zoi.string(),
+            "timeFormat" => Zoi.string(),
+            "timeZone" => Zoi.string(),
+            "ratePlan" =>
+              Zoi.object(%{
+                "current" => Zoi.string(),
+                "history" =>
+                  Zoi.array(
+                    Zoi.object(%{
+                      "effectiveDate" => Zoi.ISO.datetime(),
+                      "name" => Zoi.string()
+                    })
+                  )
+              }),
+            "mobileAppAccessDeniedReason" => Zoi.null()
+          })
+
+  # @type t :: unquote(Zoi.type_spec(@schema))
+
+  def schema, do: @schema
 end

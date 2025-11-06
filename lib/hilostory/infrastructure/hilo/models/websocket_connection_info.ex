@@ -1,11 +1,14 @@
 defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo do
   @moduledoc false
-  use TypedStruct
 
-  typedstruct do
-    field :access_token, String.t()
-    field :available_transports, list()
-    field :negotiate_version, integer()
-    field :url, URI.t()
-  end
+  @schema Zoi.object(%{
+            "accessToken" => Zoi.string(),
+            "availableTransports" => Zoi.array(),
+            "negotiateVersion" => Zoi.integer(),
+            "url" => Zoi.string() |> Zoi.transform(&URI.new/1)
+          })
+
+  # @type t :: unquote(Zoi.type_spec(@schema))
+
+  def schema, do: @schema
 end
