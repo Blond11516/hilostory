@@ -5,7 +5,7 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo do
             "accessToken" => Zoi.string(),
             "availableTransports" => Zoi.array(),
             "negotiateVersion" => Zoi.integer(),
-            "url" => Zoi.string() |> Zoi.transform(&URI.new/1)
+            "url" => Zoi.url() |> Zoi.transform(&URI.new/1)
           })
 
   # @type t :: unquote(Zoi.type_spec(@schema))
