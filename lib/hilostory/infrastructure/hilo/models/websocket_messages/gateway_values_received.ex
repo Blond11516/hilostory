@@ -12,7 +12,5 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.GatewayValuesRe
             "valueType" => Zoi.nullable(Zoi.string())
           })
 
-  # @type t :: unquote(Zoi.type_spec(@schema))
-
   def schema, do: @schema
 end

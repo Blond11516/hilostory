@@ -19,7 +19,5 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceListIniti
             "type" => Zoi.string()
           })
 
-  # @type t :: unquote(Zoi.type_spec(@schema))
-
   def schema, do: @schema
 end

@@ -8,7 +8,5 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketConnectionInfo do
             "url" => Zoi.url() |> Zoi.transform(&URI.new/1)
           })
 
-  # @type t :: unquote(Zoi.type_spec(@schema))
-
   def schema, do: @schema
 end

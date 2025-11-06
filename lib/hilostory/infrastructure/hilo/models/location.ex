@@ -28,7 +28,5 @@ defmodule Hilostory.Infrastructure.Hilo.Models.Location do
             "mobileAppAccessDeniedReason" => Zoi.null()
           })
 
-  # @type t :: unquote(Zoi.type_spec(@schema))
-
   def schema, do: @schema
 end

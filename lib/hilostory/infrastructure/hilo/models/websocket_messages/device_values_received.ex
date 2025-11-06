@@ -13,7 +13,5 @@ defmodule Hilostory.Infrastructure.Hilo.Models.WebsocketMessages.DeviceValuesRec
             "operationId" => Zoi.nullable(Zoi.string())
           })
 
-  # @type t :: unquote(Zoi.type_spec(@schema))
-
   def schema, do: @schema
 end

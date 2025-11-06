@@ -29,7 +29,5 @@ defmodule Hilostory.Infrastructure.Hilo.Models.Device do
             "type" => Zoi.string()
           })
 
-  # @type t :: unquote(Zoi.type_spec(@schema))
-
   def schema, do: @schema
 end
