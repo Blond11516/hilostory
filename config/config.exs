@@ -13,7 +13,7 @@ config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.25.11",
+  version: "0.25.12",
   hilostory: [
     args:
       ~w(ts/app.ts --bundle --target=es2022 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --alias:@=.),
