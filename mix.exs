@@ -78,7 +78,7 @@ defmodule Hilostory.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["esbuild.install --if-missing", "cmd cd assets && bun install"],
+      "assets.setup": ["esbuild.install --if-missing", "cmd --cd assets bun install"],
       "assets.build": ["esbuild hilostory"],
       "assets.deploy": [
         "esbuild hilostory --minify",
