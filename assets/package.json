@@ -7,7 +7,7 @@
 		"uplot": "1.6.32"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.3.4",
+		"@biomejs/biome": "2.3.5",
 		"@total-typescript/tsconfig": "1.0.4",
 		"@types/phoenix": "1.6.6",
 		"typescript": "5.9.3"
