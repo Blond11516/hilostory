@@ -3,7 +3,7 @@ model: environment
 id: ev_qkhnHsePvR
 workspaceId: wk_AoKEGnLnSw
 createdAt: 2025-10-30T01:35:02.234442566
-updatedAt: 2025-10-30T01:50:58.712394056
+updatedAt: 2025-12-07T22:02:39.741036240
 name: Global Variables
 public: true
 base: true
@@ -18,4 +18,9 @@ variables:
   name: HILO_BASE_URL
   value: https://api.hiloenergie.com
   id: Xt2IFtRugM
+- enabled: true
+  name: PLATFORM_HOST
+  value: platform.hiloenergie.com
+  id: TxBxBXinhB
 color: null
+sortPriority: 0.0

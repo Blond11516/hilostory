@@ -1,0 +1,94 @@
+type: http_request
+model: http_request
+id: rq_jE2jxQ6Ek4
+createdAt: 2025-12-07T18:26:10.840434762
+updatedAt: 2025-12-07T22:03:35.191405728
+workspaceId: wk_AoKEGnLnSw
+folderId: fl_sCuZmHHjFp
+authentication: {}
+authenticationType: null
+body:
+  query: |-
+    subscription onAnyDeviceUpdated($locationHiloId: String!) {
+        onAnyDeviceUpdated(locationHiloId: $locationHiloId) {
+            deviceType
+            locationHiloId
+            transmissionTime
+            operationId
+            status
+            device {
+                ... on BasicSmartMeter {
+                    deviceType
+                    hiloId
+                    physicalAddress
+                    connectionStatus
+                    zigBeeChannel
+                    power {
+                        value
+                        kind
+                    }
+                }
+                ... on BasicThermostat {
+                    deviceType
+                    hiloId
+                    physicalAddress
+                    connectionStatus
+                    ambientHumidity
+                    gDState
+                    version
+                    zigbeeVersion
+                    ambientTemperature {
+                        value
+                        kind
+                    }
+                    ambientTempSetpoint {
+                        value
+                        kind
+                    }
+                    maxAmbientTempSetpoint {
+                        value
+                        kind
+                    }
+                    minAmbientTempSetpoint {
+                        value
+                        kind
+                    }
+                    maxAmbientTempSetpointLimit {
+                        value
+                        kind
+                    }
+                    minAmbientTempSetpointLimit {
+                        value
+                        kind
+                    }
+                    heatDemand
+                    power {
+                        value
+                        kind
+                    }
+                    mode
+                    allowedModes
+                }
+            }
+        }
+    }
+  variables: |-
+    {
+      "locationHiloId": "urn:hilo:crm:4594276-s3h2l9:0"
+    }
+bodyType: graphql
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vt35GWpQYr
+method: POST
+name: Subscribe to device updates
+sortPriority: 1000.001
+url: https://${[ PLATFORM_HOST ]}/api/digital-twin/v3/graphql
+urlParameters:
+- enabled: true
+  name: ''
+  value: ''
+  id: E8ydEC9ExG

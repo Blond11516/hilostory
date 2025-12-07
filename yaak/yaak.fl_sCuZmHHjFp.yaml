@@ -1,0 +1,13 @@
+type: folder
+model: folder
+id: fl_sCuZmHHjFp
+createdAt: 2025-12-07T18:02:59.530162443
+updatedAt: 2025-12-07T18:02:59.530164317
+workspaceId: wk_AoKEGnLnSw
+folderId: null
+authentication: {}
+authenticationType: null
+description: ''
+headers: []
+name: GraphQL
+sortPriority: -1765130579528.0

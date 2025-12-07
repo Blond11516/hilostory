@@ -1,0 +1,92 @@
+type: http_request
+model: http_request
+id: rq_4UQ3K2iVxG
+createdAt: 2025-12-07T18:03:02.747921484
+updatedAt: 2025-12-07T22:02:23.020838954
+workspaceId: wk_AoKEGnLnSw
+folderId: fl_sCuZmHHjFp
+authentication: {}
+authenticationType: null
+body:
+  query: |-
+    query getLocation($locationHiloId: String!) {
+                    getLocation(id:$locationHiloId) {
+                        hiloId
+                        lastUpdate
+                        lastUpdateVersion
+                          devices(where: {or: [{deviceType: {eq: "Meter"}}, {deviceType: {eq: "Tstat"}}]}) {
+                            deviceType
+                            hiloId
+                            physicalAddress
+                            connectionStatus
+                            ... on BasicSmartMeter {
+                                deviceType
+                                hiloId
+                                physicalAddress
+                                connectionStatus
+                                zigBeeChannel
+                                power {
+                                    value
+                                    kind
+                                }
+                            }
+                            ... on BasicThermostat {
+                                deviceType
+                                hiloId
+                                physicalAddress
+                                connectionStatus
+                                ambientHumidity
+                                gDState
+                                version
+                                zigbeeVersion
+                                ambientTemperature {
+                                    value
+                                    kind
+                                }
+                                ambientTempSetpoint {
+                                    value
+                                    kind
+                                }
+                                maxAmbientTempSetpoint {
+                                    value
+                                    kind
+                                }
+                                minAmbientTempSetpoint {
+                                    value
+                                    kind
+                                }
+                                maxAmbientTempSetpointLimit {
+                                    value
+                                    kind
+                                }
+                                minAmbientTempSetpointLimit {
+                                    value
+                                    kind
+                                }
+                                heatDemand
+                                power {
+                                    value
+                                    kind
+                                }
+                                mode
+                                allowedModes
+                            }
+                        }
+                    }
+        }
+  variables: |-
+    {
+      "locationHiloId": "urn:hilo:crm:4594276-s3h2l9:0"
+    }
+bodyType: graphql
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vt35GWpQYr
+method: POST
+name: List devices
+sortPriority: 1000.0
+url: https://${[ PLATFORM_HOST ]}/api/digital-twin/v3/graphql
+urlParameters: []
