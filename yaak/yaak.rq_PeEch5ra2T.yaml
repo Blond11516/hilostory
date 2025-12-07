@@ -1,0 +1,23 @@
+type: http_request
+model: http_request
+id: rq_PeEch5ra2T
+createdAt: 2025-12-07T16:46:46.164992687
+updatedAt: 2025-12-07T16:54:29.265742843
+workspaceId: wk_AoKEGnLnSw
+folderId: fl_qFeJDtoVcs
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_5XmDKcGhfm', path=b64'JC5hY2Nlc3NUb2tlbg') ]}
+authenticationType: bearer
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: ''
+  value: ''
+  id: PAPPpdjUtm
+method: POST
+name: Get connection ID
+sortPriority: 1000.0
+url: ${[ regex.match(regex=b64'Xmh0dHBzOlwvXC9bYS16QS1aXC5cL10q', input=b64'JHtbIHJlc3BvbnNlLmJvZHkucGF0aChiZWhhdmlvcj0nc21hcnQnLCB0dGw9JzAnLCByZXN1bHQ9J2ZpcnN0Jywgam9pbj1iNjQnTENBJywgcmVxdWVzdD0ncnFfNVhtREtjR2hmbScsIHBhdGg9YjY0J0pDNTFjbXcnKSBdfQ') ]}negotiate${[ regex.match(regex=b64'XD8uKg', input=b64'JHtbIHJlc3BvbnNlLmJvZHkucGF0aChiZWhhdmlvcj0nc21hcnQnLCB0dGw9JzAnLCByZXN1bHQ9J2ZpcnN0Jywgam9pbj1iNjQnTENBJywgcmVxdWVzdD0ncnFfNVhtREtjR2hmbScsIHBhdGg9YjY0J0pDNTFjbXcnKSBdfQ') ]}
+urlParameters: []
