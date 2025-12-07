@@ -48,6 +48,19 @@ defmodule Hilostory.Signalr.Message do
     Jason.encode!(%{"type" => @types_to_type_codes[:ping]}) <> @record_separator
   end
 
+  def handshake_frame do
+    Jason.encode!(%{"protocol" => "json", "version" => 1}) <> @record_separator
+  end
+
+  def subscribe_to_location_frame(location_id) when is_integer(location_id) do
+    Jason.encode!(%{
+      "arguments" => [location_id],
+      "invocationId" => "0",
+      "target" => "SubscribeToLocation",
+      "type" => 1
+    }) <> @record_separator
+  end
+
   defp parse_message(raw_message) do
     with {:ok, message} <- Jason.decode(raw_message),
          {:ok, type_code} <- get_type_code(message),

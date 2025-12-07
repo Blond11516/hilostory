@@ -63,7 +63,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
   @impl true
   def handle_cast(:handshake, state) do
-    handshake_frame = {:text, Jason.encode!(%{"protocol" => "json", "version" => 1}) <> "\u001e"}
+    handshake_frame = {:text, Message.handshake_frame()}
     Logger.debug("Sending websocket handshake #{inspect(handshake_frame)}")
     WebSockex.cast(self(), :run_connected_callback)
     {:reply, handshake_frame, state}
@@ -81,14 +81,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   end
 
   def handle_cast({:subscribe_to_location, location}, state) do
-    subsrciption_frame =
-      {:text,
-       Jason.encode!(%{
-         "arguments" => [location["id"]],
-         "invocationId" => "0",
-         "target" => "SubscribeToLocation",
-         "type" => 1
-       })}
+    subsrciption_frame = {:text, Message.subscribe_to_location_frame(location["id"])}
 
     Logger.debug("Sending websocket frame to subscribe to location #{location["id"]}: #{inspect(subsrciption_frame)}")
 
