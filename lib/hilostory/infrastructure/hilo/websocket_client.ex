@@ -3,11 +3,6 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   use WebSockex
 
   alias Hilostory.Device
-  alias Hilostory.DeviceValue.ConnectionState
-  alias Hilostory.DeviceValue.DrmsState
-  alias Hilostory.DeviceValue.GdState
-  alias Hilostory.DeviceValue.Heating
-  alias Hilostory.DeviceValue.PairingState
   alias Hilostory.DeviceValue.Power
   alias Hilostory.DeviceValue.TargetTemperature
   alias Hilostory.DeviceValue.Temperature
@@ -230,18 +225,6 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
       |> Enum.each(fn value ->
         parsed_value =
           case value.attribute do
-            "Disconnected" ->
-              %ConnectionState{
-                connected?: !value.value,
-                timestamp: value.time_stamp_utc
-              }
-
-            "Unpaired" ->
-              %PairingState{
-                paired?: !value.value,
-                timestamp: value.time_stamp_utc
-              }
-
             "CurrentTemperature" ->
               %Temperature{
                 temperature: value.value,
@@ -254,27 +237,9 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
                 timestamp: value.time_stamp_utc
               }
 
-            "Heating" ->
-              %Heating{
-                heating: value.value,
-                timestamp: value.time_stamp_utc
-              }
-
             "Power" ->
               %Power{
                 power: value.value,
-                timestamp: value.time_stamp_utc
-              }
-
-            "GdState" ->
-              %GdState{
-                state: value.value,
-                timestamp: value.time_stamp_utc
-              }
-
-            "DrmsState" ->
-              %DrmsState{
-                state: value.value,
                 timestamp: value.time_stamp_utc
               }
 
