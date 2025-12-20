@@ -1,9 +1,9 @@
-defmodule Hilostory.DeviceValue.TargetTemperature do
+defmodule Hilostory.DeviceValue.Reading do
   @moduledoc false
   use TypedStruct
 
   typedstruct enforce: true do
-    field :target_temperature, float()
     field :timestamp, DateTime.t()
+    field :value, Hilostory.DeviceValue.t()
   end
 end

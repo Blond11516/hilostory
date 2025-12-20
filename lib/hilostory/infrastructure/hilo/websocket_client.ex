@@ -3,9 +3,8 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
   use WebSockex
 
   alias Hilostory.Device
-  alias Hilostory.DeviceValue.Power
-  alias Hilostory.DeviceValue.TargetTemperature
-  alias Hilostory.DeviceValue.Temperature
+  alias Hilostory.DeviceValue
+  alias Hilostory.DeviceValue.Reading
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Infrastructure.DeviceValueRepository
   alias Hilostory.Infrastructure.Hilo.AutomationClient
@@ -226,21 +225,33 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
         parsed_value =
           case value.attribute do
             "CurrentTemperature" ->
-              %Temperature{
-                temperature: value.value,
-                timestamp: value.time_stamp_utc
+              %Reading{
+                timestamp: value.time_stamp_utc,
+                value: %DeviceValue{
+                  value: value.value,
+                  type: :ambient_temperature,
+                  kind: "DEGREE_CELSIUS"
+                }
               }
 
             "TargetTemperature" ->
-              %TargetTemperature{
-                target_temperature: value.value,
-                timestamp: value.time_stamp_utc
+              %Reading{
+                timestamp: value.time_stamp_utc,
+                value: %DeviceValue{
+                  value: value.value,
+                  type: :ambient_temperature_setpoint,
+                  kind: "DEGREE_CELSIUS"
+                }
               }
 
             "Power" ->
-              %Power{
-                power: value.value,
-                timestamp: value.time_stamp_utc
+              %Reading{
+                timestamp: value.time_stamp_utc,
+                value: %DeviceValue{
+                  value: value.value,
+                  type: :power,
+                  kind: "WATT"
+                }
               }
 
             _ ->

@@ -2,9 +2,7 @@ defmodule HilostoryWeb.HomeLive do
   @moduledoc false
   use HilostoryWeb, :live_view
 
-  alias Hilostory.DeviceValue.Power
-  alias Hilostory.DeviceValue.TargetTemperature
-  alias Hilostory.DeviceValue.Temperature
+  alias Hilostory.DeviceValue.Reading
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Infrastructure.DeviceValueRepository
   alias Phoenix.LiveView.AsyncResult
@@ -289,26 +287,26 @@ defmodule HilostoryWeb.HomeLive do
   defp fetch_device_data(device_id, period) do
     power_task =
       Task.async(fn ->
-        Power
+        :power
         |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %Power{} = value -> {DateTime.to_unix(value.timestamp), value.power} end)
+        |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
       end)
 
     temperature_task =
       Task.async(fn ->
-        Temperature
+        :ambient_temperature
         |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %Temperature{} = value ->
-          {DateTime.to_unix(value.timestamp), value.temperature}
+        |> Map.new(fn %Reading{} = reading ->
+          {DateTime.to_unix(reading.timestamp), reading.value.value}
         end)
       end)
 
     target_temperature_task =
       Task.async(fn ->
-        TargetTemperature
+        :ambient_temperature_setpoint
         |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %TargetTemperature{} = value ->
-          {DateTime.to_unix(value.timestamp), value.target_temperature}
+        |> Map.new(fn %Reading{} = reading ->
+          {DateTime.to_unix(reading.timestamp), reading.value.value}
         end)
       end)
 
