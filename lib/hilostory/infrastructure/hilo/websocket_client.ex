@@ -175,7 +175,6 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
       |> Enum.map(&Zoi.parse!(DeviceListInitialValuesReceived.schema(), &1))
       |> Enum.each(fn device ->
         device = %Device{
-          id: device["id"],
           hilo_id: device["hiloId"],
           name: device["name"],
           type: device["type"]
@@ -185,10 +184,10 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
         |> DeviceRepository.upsert()
         |> case do
           {:ok, _} ->
-            Logger.info("Successfully persisted device #{device.id}")
+            Logger.info("Successfully persisted device #{device.hilo_id}")
 
           {:error, error} ->
-            Logger.error("Failed to persist device #{device.id}: #{inspect(error)}")
+            Logger.error("Failed to persist device #{device.hilo_id}: #{inspect(error)}")
         end
       end)
 

@@ -11,10 +11,8 @@ defmodule Hilostory.Schema.DeviceSchema do
   alias Hilostory.Schema.TargetTemperatureSchema
   alias Hilostory.Schema.TemperatureSchema
 
-  @primary_key {:id, :integer, []}
-
   schema "device" do
-    field :hilo_id, :string
+    field :hilo_id, :string, primary_key: true
     field :name, :string
     field :type, :string
     has_many :connection_states, ConnectionStateSchema, foreign_key: :device_id
