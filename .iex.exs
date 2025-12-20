@@ -20,7 +20,12 @@ end
 
 import_if_available(IexHelpers)
 
-if Code.ensure_loaded?(IexAccessTokenStore) do
+started? =
+  Application.started_applications()
+  |> Enum.map(&elem(&1, 0))
+  |> Enum.any?(&(&1 == :hilostory))
+
+if started? && Code.ensure_loaded?(IexAccessTokenStore) do
   IexAccessTokenStore.start_link()
 end
 
