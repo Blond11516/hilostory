@@ -52,7 +52,7 @@ if config_env() == :prod do
   config :hilostory, Hilostory.Repo,
     # ssl: true,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "4"),
     socket_options: maybe_ipv6
 
   config :hilostory, HilostoryWeb.Endpoint,
