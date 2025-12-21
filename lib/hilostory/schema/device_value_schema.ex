@@ -11,7 +11,7 @@ defmodule Hilostory.Schema.DeviceValueSchema do
   schema "device_value" do
     field :timestamp, :utc_datetime_usec, primary_key: true
     field :value_name, Ecto.Enum, values: [:ambient_temperature, :ambient_temperature_setpoint, :power], primary_key: true
-    belongs_to :device, DeviceSchema, primary_key: true
+    belongs_to :device, DeviceSchema, references: :hilo_id, type: :string, primary_key: true
     field :value, :float
     field :kind, :string
   end

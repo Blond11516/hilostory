@@ -260,7 +260,7 @@ defmodule Hilostory.Infrastructure.Hilo.WebsocketClient do
 
         if parsed_value != :untracked_value do
           parsed_value
-          |> DeviceValueRepository.insert(value.device_id)
+          |> DeviceValueRepository.upsert(value.device_id)
           |> case do
             {:ok, _} ->
               Logger.info(
