@@ -2,4 +2,5 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
+export POOL_SIZE=2
 exec ./hilostory eval Hilostory.Release.migrate
