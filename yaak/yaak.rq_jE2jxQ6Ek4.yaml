@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_jE2jxQ6Ek4
 createdAt: 2025-12-07T18:26:10.840434762
-updatedAt: 2025-12-07T22:03:35.191405728
+updatedAt: 2025-12-21T01:22:35.681562706
 workspaceId: wk_AoKEGnLnSw
 folderId: fl_sCuZmHHjFp
 authentication: {}
@@ -11,18 +11,12 @@ body:
   query: |-
     subscription onAnyDeviceUpdated($locationHiloId: String!) {
         onAnyDeviceUpdated(locationHiloId: $locationHiloId) {
-            deviceType
             locationHiloId
             transmissionTime
-            operationId
-            status
             device {
                 ... on BasicSmartMeter {
                     deviceType
                     hiloId
-                    physicalAddress
-                    connectionStatus
-                    zigBeeChannel
                     power {
                         value
                         kind
@@ -31,12 +25,6 @@ body:
                 ... on BasicThermostat {
                     deviceType
                     hiloId
-                    physicalAddress
-                    connectionStatus
-                    ambientHumidity
-                    gDState
-                    version
-                    zigbeeVersion
                     ambientTemperature {
                         value
                         kind
@@ -45,29 +33,10 @@ body:
                         value
                         kind
                     }
-                    maxAmbientTempSetpoint {
-                        value
-                        kind
-                    }
-                    minAmbientTempSetpoint {
-                        value
-                        kind
-                    }
-                    maxAmbientTempSetpointLimit {
-                        value
-                        kind
-                    }
-                    minAmbientTempSetpointLimit {
-                        value
-                        kind
-                    }
-                    heatDemand
                     power {
                         value
                         kind
                     }
-                    mode
-                    allowedModes
                 }
             }
         }
