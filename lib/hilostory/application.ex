@@ -7,23 +7,25 @@ defmodule Hilostory.Application do
 
   @impl true
   def start(_type, _args) do
-    base_children = [
-      HilostoryWeb.Telemetry,
-      Hilostory.Repo,
-      {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
-      Hilostory.Joken.HiloStrategy,
-      Hilostory.TokenManager,
-      {Phoenix.PubSub, name: Hilostory.PubSub},
-      Hilostory.Vault,
-      Hilostory.WebsocketSupervisor,
-      Hilostory.WebsocketStarter,
-      HilostoryWeb.Endpoint
-    ]
+    start_app = Application.get_env(:hilostory, :start_app, true)
 
     children =
-      append_if(
-        base_children,
-        Application.get_env(:hilostory, :env) != :test,
+      [
+        HilostoryWeb.Telemetry,
+        Hilostory.Repo
+      ]
+      |> append_if(start_app, [
+        {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
+        Hilostory.Joken.HiloStrategy,
+        Hilostory.TokenManager,
+        {Phoenix.PubSub, name: Hilostory.PubSub},
+        Hilostory.Vault,
+        Hilostory.WebsocketSupervisor,
+        Hilostory.WebsocketStarter,
+        HilostoryWeb.Endpoint
+      ])
+      |> append_if(
+        start_app and Application.get_env(:hilostory, :env) != :test,
         {Tz.UpdatePeriodically, []}
       )
 
@@ -45,7 +47,11 @@ defmodule Hilostory.Application do
     :ok
   end
 
+  defp append_if(list, condition, items) when is_list(items) do
+    if condition, do: list ++ items, else: list
+  end
+
   defp append_if(list, condition, item) do
-    if condition, do: list ++ [item], else: list
+    append_if(list, condition, [item])
   end
 end

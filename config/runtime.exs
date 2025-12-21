@@ -20,6 +20,10 @@ if System.get_env("PHX_SERVER") do
   config :hilostory, HilostoryWeb.Endpoint, server: true
 end
 
+if System.get_env("START_CONTEXT") == "migrations" do
+  config :hilostory, :start_app, false
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
