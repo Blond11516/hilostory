@@ -28,7 +28,7 @@ defmodule HilostoryWeb.HomeLive do
     device_data_loaded? =
       assigns.devices.ok? and
         Enum.all?(assigns.devices.result, fn device ->
-          Map.has_key?(assigns, device.id |> Integer.to_string() |> String.to_existing_atom())
+          Map.has_key?(assigns, String.to_existing_atom(device.hilo_id))
         end)
 
     assigns =
@@ -36,7 +36,7 @@ defmodule HilostoryWeb.HomeLive do
         assign(assigns,
           devices_data:
             Map.filter(assigns, fn {device_id, _} ->
-              device_id |> Atom.to_string() |> Integer.parse() != :error
+              Enum.any?(assigns.devices.result, fn device -> device.hilo_id == Atom.to_string(device_id) end)
             end)
         )
       else
@@ -158,7 +158,7 @@ defmodule HilostoryWeb.HomeLive do
     case result do
       {:ok, devices} ->
         device_ids =
-          Enum.map(devices, fn device -> device.id |> Integer.to_string() |> String.to_atom() end)
+          Enum.map(devices, fn device -> String.to_atom(device.hilo_id) end)
 
         period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
 
@@ -278,7 +278,7 @@ defmodule HilostoryWeb.HomeLive do
   defp fetch_data(devices, period) do
     device_data =
       Map.new(devices, fn device ->
-        {device.id |> Integer.to_string() |> String.to_existing_atom(), {device, fetch_device_data(device.id, period)}}
+        {String.to_existing_atom(device.hilo_id), {device, fetch_device_data(device.hilo_id, period)}}
       end)
 
     {:ok, device_data}

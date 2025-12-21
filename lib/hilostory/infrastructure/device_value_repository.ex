@@ -31,7 +31,7 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
 
   @spec fetch(:ambient_temperature | :ambient_temperature_setpoint | :power, String.t(), {DateTime.t(), Datetime.t()}) ::
           struct()
-  def fetch(value, device_id, period) when value in [Temperature, TargetTemperature, Power] do
+  def fetch(value, device_id, period) when value in [:ambient_temperature, :ambient_temperature_setpoint, :power] do
     {period_start, period_end} = period
 
     from(v in DeviceValueSchema,
