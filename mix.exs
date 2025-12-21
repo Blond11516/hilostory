@@ -61,7 +61,7 @@ defmodule Hilostory.MixProject do
       {:live_debugger, "0.5.0", only: [:dev]},
       {:phoenix_live_reload, "1.6.2", only: :dev},
       {:igniter, "0.7.0", only: :dev},
-      {:styler, "1.9.1", only: [:dev, :test], runtime: false},
+      {:styler, "1.10.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.7", only: [:dev, :test], runtime: false},
       {:lazy_html, "0.1.8", only: :test}
     ]

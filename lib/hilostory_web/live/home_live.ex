@@ -248,7 +248,7 @@ defmodule HilostoryWeb.HomeLive do
     devices = socket.assigns.devices.result
 
     device_ids =
-      Enum.map(devices, fn device -> device.hilo_id  |> String.to_atom() end)
+      Enum.map(devices, fn device -> String.to_atom(device.hilo_id) end)
 
     period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
     assign_async(socket, device_ids, fn -> fetch_data(devices, period) end)
