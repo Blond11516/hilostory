@@ -34,11 +34,11 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "1.8.0"},
-      {:castore, "1.0.16"},
+      {:bandit, "1.9.0"},
+      {:castore, "1.0.17"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
-      {:ecto_sql, "3.13.2"},
+      {:ecto_sql, "3.13.3"},
       {:esbuild, "0.10.0", runtime: Mix.env() == :dev},
       {:finch, "0.20.0"},
       {:joken, "2.6.2"},
@@ -47,7 +47,7 @@ defmodule Hilostory.MixProject do
       {:phoenix_ecto, "4.7.0"},
       {:phoenix_html, "4.3.0"},
       {:phoenix_live_dashboard, "0.8.7"},
-      {:phoenix_live_view, "1.1.17"},
+      {:phoenix_live_view, "1.1.19"},
       {:postgrex, "0.21.1"},
       {:req, "0.5.16"},
       {:telemetry_metrics, "1.1.0"},
@@ -59,7 +59,7 @@ defmodule Hilostory.MixProject do
       {:websockex, "0.4.3"},
       {:zoi, "0.10.6"},
       {:live_debugger, "0.5.0", only: [:dev]},
-      {:phoenix_live_reload, "1.6.1", only: :dev},
+      {:phoenix_live_reload, "1.6.2", only: :dev},
       {:igniter, "0.7.0", only: :dev},
       {:styler, "1.9.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.7", only: [:dev, :test], runtime: false},
