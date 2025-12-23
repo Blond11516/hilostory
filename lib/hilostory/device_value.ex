@@ -11,7 +11,7 @@ defmodule Hilostory.DeviceValue do
   end
 
   def normalized(%__MODULE__{kind: "KILOWATT"} = value) do
-    %{value | kind: "WATT", value: value.value * 1000}
+    %{value | kind: "WATT", value: Float.round(value.value * 1000)}
   end
 
   def normalized(%__MODULE__{kind: kind} = value) when kind in ["WATT", "DEGREE_CELSIUS"] do
