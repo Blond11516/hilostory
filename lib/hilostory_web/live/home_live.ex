@@ -29,23 +29,7 @@ defmodule HilostoryWeb.HomeLive do
 
   @impl LiveView
   def render(assigns) do
-    device_data_loaded? =
-      assigns.devices.ok? and
-        Enum.all?(assigns.devices.result, fn device ->
-          Map.has_key?(assigns, String.to_existing_atom(device.hilo_id))
-        end)
-
-    assigns =
-      if device_data_loaded? do
-        assign(assigns,
-          devices_data:
-            Map.filter(assigns, fn {device_id, _} ->
-              Enum.any?(assigns.devices.result, fn device -> device.hilo_id == Atom.to_string(device_id) end)
-            end)
-        )
-      else
-        assign(assigns, devices_data: nil)
-      end
+    assigns = assign_new(assigns, :devices_data, fn -> nil end)
 
     ~H"""
     <span id="time-zone-hook-target" style="display: none;" phx-hook="PushTimeZone" />
@@ -94,21 +78,19 @@ defmodule HilostoryWeb.HomeLive do
         <div :for={device <- devices} id={"chart-#{device.name}"} phx-update="ignore" />
       </div>
     </.async_result>
-    <div :if={@devices_data != nil}>
-      <div :for={{_, device_data_result} <- @devices_data}>
-        <.async_result :let={{device, device_data}} assign={device_data_result}>
-          <:loading>Loading data</:loading>
-          <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
+    <.async_result :let={devices_data} :if={@devices_data != nil} assign={@devices_data}>
+      <:loading>Loading data</:loading>
+      <:failed :let={error}>Failed to fetch data: {inspect(error)}</:failed>
 
-          <div
-            id={"chart-#{device.name}-data"}
-            phx-hook="Chart"
-            data-data={device_data}
-            data-device-name={device.name}
-          />
-        </.async_result>
+      <div :for={{device, device_data} <- devices_data}>
+        <div
+          id={"chart-#{device.hilo_id}-data"}
+          phx-hook="Chart"
+          data-data={device_data}
+          data-device-name={device.name}
+        />
       </div>
-    </div>
+    </.async_result>
     """
   end
 
@@ -155,15 +137,12 @@ defmodule HilostoryWeb.HomeLive do
   def handle_async(:fetch_devices, result, socket) do
     case result do
       {:ok, devices} ->
-        device_ids =
-          Enum.map(devices, fn device -> String.to_atom(device.hilo_id) end)
-
         period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
 
         socket =
           socket
           |> assign(devices: AsyncResult.ok(devices))
-          |> assign_async(device_ids, fn -> fetch_data(devices, period) end)
+          |> assign_async(:devices_data, fn -> fetch_data(devices, period) end)
 
         {:noreply, socket}
 
@@ -244,12 +223,9 @@ defmodule HilostoryWeb.HomeLive do
 
   defp refresh(socket) do
     devices = socket.assigns.devices.result
-
-    device_ids =
-      Enum.map(devices, fn device -> String.to_atom(device.hilo_id) end)
-
     period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
-    assign_async(socket, device_ids, fn -> fetch_data(devices, period) end)
+
+    assign_async(socket, :devices_data, fn -> fetch_data(devices, period) end)
   end
 
   @spec format_date_time_for_input(period(), :start | :end, Calendar.time_zone() | nil) ::
@@ -278,9 +254,9 @@ defmodule HilostoryWeb.HomeLive do
       devices
       |> Enum.map(&Task.async(fn -> {&1, fetch_device_data(&1.hilo_id, period)} end))
       |> Task.await_many()
-      |> Map.new(fn {device, data} -> {String.to_existing_atom(device.hilo_id), {device, data}} end)
+      |> Map.new(fn {device, data} -> {device, data} end)
 
-    {:ok, device_data}
+    {:ok, %{devices_data: device_data}}
   end
 
   defp fetch_device_data(device_id, period) do
