@@ -1,4 +1,3 @@
-- formatter les valeurs correctement en fonction du "kind"
 - aller chercher les devices via l'api REST
 - refactor les charts pour éviter de transformer les IDs de devices en atom. Probablement pas
   besoin de tracker les data dans des assigns séparés maintenant que le charts sont rendus à part
