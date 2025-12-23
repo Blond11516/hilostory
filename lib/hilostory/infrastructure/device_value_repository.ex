@@ -38,7 +38,8 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
       where:
         v.device_id == ^device_id and
           v.timestamp > ^period_start and
-          v.timestamp < ^period_end,
+          v.timestamp < ^period_end and
+          v.value_name == ^value,
       select: v
     )
     |> Repo.all()
