@@ -7,26 +7,33 @@ defmodule Hilostory.Graphql.Subscription do
   alias Hilostory.Graphql.Message
   alias Hilostory.Graphql.SubscriptionQuery
   alias Hilostory.Infrastructure.DeviceValueRepository
+  alias Hilostory.Infrastructure.OauthTokensRepository
 
   require Logger
 
-  def start_link(%{access_token: access_token, subscription: subscription}) do
+  def start_link(%{subscription: subscription}) do
     Logger.info("Starting GraphQL subscription")
 
-    {:ok, websockex_pid} =
-      "wss://platform.hiloenergie.com"
-      |> URI.parse()
-      |> URI.append_path("/api")
-      |> URI.append_path("/digital-twin")
-      |> URI.append_path("/v3")
-      |> URI.append_path("/graphql")
-      |> URI.append_query(URI.encode_query(%{"access_token" => access_token}))
-      |> URI.to_string()
-      |> WebSockex.start_link(__MODULE__, subscription,
-        extra_headers: [{"Sec-WebSocket-Protocol", "graphql-transport-ws"}]
-      )
+    case OauthTokensRepository.get() do
+      nil ->
+        {:error, "No OAuth token found"}
 
-    {:ok, websockex_pid}
+      tokens ->
+        {:ok, websockex_pid} =
+          "wss://platform.hiloenergie.com"
+          |> URI.parse()
+          |> URI.append_path("/api")
+          |> URI.append_path("/digital-twin")
+          |> URI.append_path("/v3")
+          |> URI.append_path("/graphql")
+          |> URI.append_query(URI.encode_query(%{"access_token" => tokens.access_token}))
+          |> URI.to_string()
+          |> WebSockex.start_link(__MODULE__, subscription,
+            extra_headers: [{"Sec-WebSocket-Protocol", "graphql-transport-ws"}]
+          )
+
+        {:ok, websockex_pid}
+    end
   end
 
   @impl true

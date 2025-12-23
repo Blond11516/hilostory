@@ -4,7 +4,6 @@ defmodule Hilostory.WebsocketSupervisor do
 
   alias Hilostory.Graphql.Subscription
   alias Hilostory.Graphql.SubscriptionQuery
-  alias Hilostory.Infrastructure.OauthTokensRepository
   alias Hilostory.SupervisorChildStartErrorLogger
 
   def start_link(_) do
@@ -17,19 +16,12 @@ defmodule Hilostory.WebsocketSupervisor do
   end
 
   def start_websocket do
-    case OauthTokensRepository.get() do
-      nil ->
-        {:error, "No OAuth token found"}
-
-      tokens ->
-        DynamicSupervisor.start_child(
-          __MODULE__,
-          SupervisorChildStartErrorLogger.child_spec(Subscription, %{
-            access_token: tokens.access_token,
-            subscription: devices_subscription()
-          })
-        )
-    end
+    DynamicSupervisor.start_child(
+      __MODULE__,
+      SupervisorChildStartErrorLogger.child_spec(Subscription, %{
+        subscription: devices_subscription()
+      })
+    )
   end
 
   defp devices_subscription do
