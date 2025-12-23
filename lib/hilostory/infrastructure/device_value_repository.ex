@@ -29,9 +29,13 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
     )
   end
 
-  @spec fetch(:ambient_temperature | :ambient_temperature_setpoint | :power, String.t(), {DateTime.t(), Datetime.t()}) ::
+  @spec fetch(
+          list(:ambient_temperature | :ambient_temperature_setpoint | :power),
+          String.t(),
+          {DateTime.t(), Datetime.t()}
+        ) ::
           struct()
-  def fetch(value, device_id, period) when value in [:ambient_temperature, :ambient_temperature_setpoint, :power] do
+  def fetch(value_types, device_id, period) when is_list(value_types) do
     {period_start, period_end} = period
 
     from(v in DeviceValueSchema,
@@ -39,7 +43,7 @@ defmodule Hilostory.Infrastructure.DeviceValueRepository do
         v.device_id == ^device_id and
           v.timestamp > ^period_start and
           v.timestamp < ^period_end and
-          v.value_name == ^value,
+          v.value_name in ^value_types,
       select: v
     )
     |> Repo.all()

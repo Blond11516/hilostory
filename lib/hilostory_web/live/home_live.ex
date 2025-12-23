@@ -286,51 +286,31 @@ defmodule HilostoryWeb.HomeLive do
   end
 
   defp fetch_device_data(device_id, period) do
-    power_task =
-      Task.async(fn ->
-        :power
-        |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %Reading{} = reading ->
-          {DateTime.to_unix(reading.timestamp), DeviceValue.normalized(reading.value).value}
-        end)
-      end)
+    readings =
+      [:ambient_temperature, :ambient_temperature_setpoint, :power]
+      |> DeviceValueRepository.fetch(device_id, period)
+      |> Enum.map(fn %Reading{} = reading -> %{reading | value: DeviceValue.normalized(reading.value)} end)
 
-    temperature_task =
-      Task.async(fn ->
-        :ambient_temperature
-        |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %Reading{} = reading ->
-          {DateTime.to_unix(reading.timestamp), DeviceValue.normalized(reading.value).value}
-        end)
-      end)
+    timestamps = MapSet.new(readings, fn %Reading{} = reading -> DateTime.to_unix(reading.timestamp) end)
 
-    target_temperature_task =
-      Task.async(fn ->
-        :ambient_temperature_setpoint
-        |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %Reading{} = reading ->
-          {DateTime.to_unix(reading.timestamp), DeviceValue.normalized(reading.value).value}
-        end)
-      end)
+    readings_by_type = Enum.group_by(readings, fn %Reading{} = reading -> reading.value.type end)
 
-    [power_values, temperature_values, target_temperature_values] =
-      Task.await_many([power_task, temperature_task, target_temperature_task])
+    power_values =
+      readings_by_type
+      |> Map.get(:power, [])
+      |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
 
-    power_timestamps =
-      MapSet.new(power_values, fn {timestamp, _} -> timestamp end)
+    temperature_values =
+      readings_by_type
+      |> Map.get(:ambient_temperature, [])
+      |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
 
-    temperature_timestamps =
-      MapSet.new(temperature_values, fn {timestamp, _} -> timestamp end)
+    target_temperature_values =
+      readings_by_type
+      |> Map.get(:ambient_temperature_setpoint, [])
+      |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
 
-    target_temperature_timestamps =
-      MapSet.new(target_temperature_values, fn {timestamp, _} -> timestamp end)
-
-    all_timestamps =
-      power_timestamps
-      |> MapSet.union(temperature_timestamps)
-      |> MapSet.union(target_temperature_timestamps)
-
-    all_timestamps
+    timestamps
     |> Map.new(fn timestamp ->
       {timestamp,
        %{
