@@ -22,12 +22,7 @@ defmodule Hilostory.Schema.DeviceValueSchema do
       value: %DeviceValue{
         type: value.value_name,
         value: value.value,
-        kind:
-          case value.value_name do
-            :ambient_temperature -> "DEGREE_CELSUS"
-            :ambient_temperature_setpoint -> "DEGREE_CELSUS"
-            :power -> "WATT"
-          end
+        kind: value.kind
       }
     }
   end

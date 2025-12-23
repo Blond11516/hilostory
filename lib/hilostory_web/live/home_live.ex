@@ -2,6 +2,7 @@ defmodule HilostoryWeb.HomeLive do
   @moduledoc false
   use HilostoryWeb, :live_view
 
+  alias Hilostory.DeviceValue
   alias Hilostory.DeviceValue.Reading
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Infrastructure.DeviceValueRepository
@@ -289,7 +290,9 @@ defmodule HilostoryWeb.HomeLive do
       Task.async(fn ->
         :power
         |> DeviceValueRepository.fetch(device_id, period)
-        |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
+        |> Map.new(fn %Reading{} = reading ->
+          {DateTime.to_unix(reading.timestamp), DeviceValue.normalized(reading.value).value}
+        end)
       end)
 
     temperature_task =
@@ -297,7 +300,7 @@ defmodule HilostoryWeb.HomeLive do
         :ambient_temperature
         |> DeviceValueRepository.fetch(device_id, period)
         |> Map.new(fn %Reading{} = reading ->
-          {DateTime.to_unix(reading.timestamp), reading.value.value}
+          {DateTime.to_unix(reading.timestamp), DeviceValue.normalized(reading.value).value}
         end)
       end)
 
@@ -306,7 +309,7 @@ defmodule HilostoryWeb.HomeLive do
         :ambient_temperature_setpoint
         |> DeviceValueRepository.fetch(device_id, period)
         |> Map.new(fn %Reading{} = reading ->
-          {DateTime.to_unix(reading.timestamp), reading.value.value}
+          {DateTime.to_unix(reading.timestamp), DeviceValue.normalized(reading.value).value}
         end)
       end)
 
