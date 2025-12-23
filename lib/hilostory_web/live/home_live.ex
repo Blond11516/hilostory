@@ -275,9 +275,10 @@ defmodule HilostoryWeb.HomeLive do
 
   defp fetch_data(devices, period) do
     device_data =
-      Map.new(devices, fn device ->
-        {String.to_existing_atom(device.hilo_id), {device, fetch_device_data(device.hilo_id, period)}}
-      end)
+      devices
+      |> Enum.map(&Task.async(fn -> {&1, fetch_device_data(&1.hilo_id, period)} end))
+      |> Task.await_many()
+      |> Map.new(fn {device, data} -> {String.to_existing_atom(device.hilo_id), {device, data}} end)
 
     {:ok, device_data}
   end
