@@ -22,6 +22,7 @@ defmodule HilostoryWeb.HomeLive do
       |> assign(period: {:predefined, :last_hour})
       |> assign(pending_custom_period?: false)
       |> assign(predefined_periods: @predefined_periods)
+      |> assign(time_zone: nil)
 
     {:ok, socket}
   end
@@ -45,11 +46,6 @@ defmodule HilostoryWeb.HomeLive do
       else
         assign(assigns, devices_data: nil)
       end
-
-    assigns =
-      assign(assigns,
-        time_zone: Map.get(assigns, :time_zone, nil)
-      )
 
     ~H"""
     <span id="time-zone-hook-target" style="display: none;" phx-hook="PushTimeZone" />
