@@ -21,6 +21,7 @@ defmodule HilostoryWeb.HomeLive do
       |> assign(devices: AsyncResult.loading())
       |> assign(period: {:predefined, :last_hour})
       |> assign(pending_custom_period?: false)
+      |> assign(predefined_periods: @predefined_periods)
 
     {:ok, socket}
   end
@@ -47,7 +48,6 @@ defmodule HilostoryWeb.HomeLive do
 
     assigns =
       assign(assigns,
-        predefined_periods: @predefined_periods,
         time_zone: Map.get(assigns, :time_zone, nil)
       )
 
