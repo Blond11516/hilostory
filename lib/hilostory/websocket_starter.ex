@@ -15,6 +15,7 @@ defmodule Hilostory.WebsocketStarter do
 
     case WebsocketSupervisor.start_websocket() do
       {:ok, _} -> :ok
+      {:error, :max_children} -> Logger.info("Websocket supervisor already has a child")
       {:error, error} -> Logger.error("Failed to start websocket: #{inspect(error)}")
     end
   end

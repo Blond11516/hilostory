@@ -12,7 +12,7 @@ defmodule Hilostory.WebsocketSupervisor do
 
   @impl DynamicSupervisor
   def init(_) do
-    DynamicSupervisor.init(strategy: :one_for_one)
+    DynamicSupervisor.init(strategy: :one_for_one, max_children: 1)
   end
 
   def start_websocket do
