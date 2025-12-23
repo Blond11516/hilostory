@@ -1,0 +1,19 @@
+{
+	"data": {
+		"onAnyDeviceUpdated": {
+			"deviceType": "meter",
+			"locationHiloId": "urn:hilo:crm:4594276-s3h2l9:0",
+			"transmissionTime": "2025-12-20T15:24:20.128Z",
+			"operationId": "ea57a9e7-eb94-9e44-86a8-90eb0cc73005",
+			"status": "REPORT",
+			"device": {
+				"deviceType": "meter",
+				"hiloId": "urn:hilo:philo:0xc0619a400000d287-smart_meter:0",
+				"physicalAddress": "0xC0619A400000D287-smart_meter",
+				"connectionStatus": "CONNECTED",
+				"zigBeeChannel": 20,
+				"power": { "value": 0.738, "kind": "KILOWATT" }
+			}
+		}
+	}
+}

@@ -1,0 +1,34 @@
+{
+	"data": {
+		"onAnyDeviceUpdated": {
+			"deviceType": "tstat",
+			"locationHiloId": "urn:hilo:crm:4594276-s3h2l9:0",
+			"transmissionTime": "2025-12-20T15:30:03.017Z",
+			"operationId": "5eab9228-9d44-7184-96fd-436e8cc35db0",
+			"status": "REPORT",
+			"device": {
+				"deviceType": "tstat",
+				"hiloId": "urn:hilo:philo:5cc7c1fffee9f110:0",
+				"physicalAddress": "5CC7C1FFFEE9F110",
+				"connectionStatus": "CONNECTED",
+				"ambientHumidity": 0,
+				"gDState": "EXCLUDED",
+				"version": "21",
+				"zigbeeVersion": "22",
+				"ambientTemperature": { "value": 19, "kind": "DEGREE_CELSIUS" },
+				"ambientTempSetpoint": { "value": 19, "kind": "DEGREE_CELSIUS" },
+				"maxAmbientTempSetpoint": { "value": 30, "kind": "DEGREE_CELSIUS" },
+				"minAmbientTempSetpoint": { "value": 5, "kind": "DEGREE_CELSIUS" },
+				"maxAmbientTempSetpointLimit": {
+					"value": 30,
+					"kind": "DEGREE_CELSIUS"
+				},
+				"minAmbientTempSetpointLimit": { "value": 5, "kind": "DEGREE_CELSIUS" },
+				"heatDemand": 0,
+				"power": { "value": 14, "kind": "WATT" },
+				"mode": "UNKNOWN",
+				"allowedModes": []
+			}
+		}
+	}
+}
