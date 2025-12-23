@@ -23,12 +23,12 @@ defmodule IexAccessTokenStore do
     GenServer.call(__MODULE__, :get_access_token)
   end
 
-  @impl true
+  @impl GenServer
   def init(_init_arg) do
     {:ok, nil, {:continue, :load_access_token}}
   end
 
-  @impl true
+  @impl GenServer
   def handle_continue(:load_access_token, _state) do
     fn -> nil end
     |> Stream.repeatedly()
@@ -47,12 +47,12 @@ defmodule IexAccessTokenStore do
     {:noreply, update_token()}
   end
 
-  @impl true
+  @impl GenServer
   def handle_info(:update_token, _state) do
     {:noreply, update_token()}
   end
 
-  @impl true
+  @impl GenServer
   def handle_call(:get_access_token, _from, state) do
     access_token =
       with nil <- state,

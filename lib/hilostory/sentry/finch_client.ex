@@ -2,12 +2,12 @@ defmodule Hilostory.Sentry.FinchClient do
   @moduledoc false
   @behaviour Sentry.HTTPClient
 
-  @impl true
+  @impl Sentry.HTTPClient
   def child_spec do
     Supervisor.child_spec({Finch, name: __MODULE__}, id: __MODULE__)
   end
 
-  @impl true
+  @impl Sentry.HTTPClient
   def post(url, headers, body) do
     request = Finch.build(:post, url, headers, body)
 

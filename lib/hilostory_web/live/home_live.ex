@@ -6,6 +6,7 @@ defmodule HilostoryWeb.HomeLive do
   alias Hilostory.DeviceValue.Reading
   alias Hilostory.Infrastructure.DeviceRepository
   alias Hilostory.Infrastructure.DeviceValueRepository
+  alias Phoenix.LiveView
   alias Phoenix.LiveView.AsyncResult
 
   @type predefined_period :: :last_hour | :last_day | :last_am_challenge | :last_pm_challenge
@@ -13,7 +14,7 @@ defmodule HilostoryWeb.HomeLive do
 
   @predefined_periods [:last_hour, :last_day, :last_am_challenge, :last_pm_challenge]
 
-  @impl true
+  @impl LiveView
   def mount(_params, _session, socket) do
     socket =
       socket
@@ -24,7 +25,7 @@ defmodule HilostoryWeb.HomeLive do
     {:ok, socket}
   end
 
-  @impl true
+  @impl LiveView
   def render(assigns) do
     device_data_loaded? =
       assigns.devices.ok? and
@@ -115,7 +116,7 @@ defmodule HilostoryWeb.HomeLive do
     """
   end
 
-  @impl true
+  @impl LiveView
   def handle_event("refresh", _, socket) do
     {:noreply, refresh(socket)}
   end
@@ -154,7 +155,7 @@ defmodule HilostoryWeb.HomeLive do
     {:noreply, socket}
   end
 
-  @impl true
+  @impl LiveView
   def handle_async(:fetch_devices, result, socket) do
     case result do
       {:ok, devices} ->

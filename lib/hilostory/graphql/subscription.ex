@@ -36,7 +36,7 @@ defmodule Hilostory.Graphql.Subscription do
     end
   end
 
-  @impl true
+  @impl WebSockex
   def handle_connect(_conn, state) do
     Logger.info("Websocket connected, will initialize connection")
 
@@ -45,14 +45,14 @@ defmodule Hilostory.Graphql.Subscription do
     {:ok, state}
   end
 
-  @impl true
+  @impl WebSockex
   def handle_disconnect(connection_status_map, state) do
     Logger.info("Websocket disconnected: #{connection_status_map}")
 
     {:ok, state}
   end
 
-  @impl true
+  @impl WebSockex
   def handle_cast(:initialize_connection, state) do
     message = {:text, Message.initialize_connection()}
 
@@ -77,7 +77,7 @@ defmodule Hilostory.Graphql.Subscription do
     {:reply, message, state}
   end
 
-  @impl true
+  @impl WebSockex
   def handle_frame(frame, state) do
     Logger.debug("Received frame #{inspect(frame)}")
 
@@ -91,7 +91,7 @@ defmodule Hilostory.Graphql.Subscription do
     {:ok, state}
   end
 
-  @impl true
+  @impl WebSockex
   def terminate(close_reason, _state) do
     Logger.error("Subscription terminating: #{inspect(close_reason)}")
 

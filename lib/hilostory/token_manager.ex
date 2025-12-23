@@ -17,12 +17,12 @@ defmodule Hilostory.TokenManager do
     GenServer.call(__MODULE__, :get)
   end
 
-  @impl true
+  @impl GenServer
   def init(_init_arg) do
     {:ok, nil, {:continue, :maybe_self_start_loop}}
   end
 
-  @impl true
+  @impl GenServer
   def handle_call(:get, _, _) do
     case do_get() do
       {:ok, tokens, _claims} -> {:reply, {:ok, tokens}, nil}
@@ -30,7 +30,7 @@ defmodule Hilostory.TokenManager do
     end
   end
 
-  @impl true
+  @impl GenServer
   def handle_continue(:maybe_self_start_loop, state) do
     Logger.info("Attempting to start access token refresh loop.")
 
@@ -39,7 +39,7 @@ defmodule Hilostory.TokenManager do
     {:noreply, state}
   end
 
-  @impl true
+  @impl GenServer
   def handle_info(:refresh, state) do
     Logger.info("Refreshing access token.")
 

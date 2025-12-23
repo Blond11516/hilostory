@@ -2,7 +2,9 @@ defmodule HilostoryWeb.LoginLive do
   @moduledoc false
   use HilostoryWeb, :live_view
 
-  @impl true
+  alias Phoenix.LiveView
+
+  @impl LiveView
   def mount(_params, _session, socket) do
     if Hilostory.HiloTokens.has_valid_tokens() do
       {:ok, redirect(socket, to: ~p"/")}
@@ -11,7 +13,7 @@ defmodule HilostoryWeb.LoginLive do
     end
   end
 
-  @impl true
+  @impl LiveView
   def render(assigns) do
     ~H"""
     <.link href={~p"/auth/login"}>Login</.link>

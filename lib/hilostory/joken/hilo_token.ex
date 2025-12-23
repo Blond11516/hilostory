@@ -6,7 +6,7 @@ defmodule Hilostory.Joken.HiloToken do
 
   add_hook(JokenJwks, strategy: Hilostory.Joken.HiloStrategy)
 
-  @impl true
+  @impl Joken.Config
   def token_config do
     add_claim(%{}, "aud", nil, fn aud -> aud == @expected_aud end)
   end

@@ -6,10 +6,10 @@ defmodule HilostoryWeb.Plugs.HiloAuthenticated do
 
   HilostoryWeb.verified_routes()
 
-  @impl true
+  @impl Plug
   def init(options), do: options
 
-  @impl true
+  @impl Plug
   def call(conn, _opts) do
     if Hilostory.HiloTokens.has_valid_tokens() do
       conn
