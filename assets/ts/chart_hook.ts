@@ -62,6 +62,7 @@ class Chart extends ViewHook {
 				{
 					scale: "watts",
 					values: (_self, ticks) => ticks.map((it) => `${it} W`),
+					size: 60,
 				},
 				{
 					scale: "degrees celcius",
