@@ -6,6 +6,7 @@ defmodule Hilostory.TokenManager do
   alias Hilostory.Joken.HiloToken
   alias Hilostory.Schema.OauthTokensSchema
   alias Hilostory.TokenRefresher
+  alias Hilostory.WebsocketStarter
 
   require Logger
 
@@ -51,9 +52,14 @@ defmodule Hilostory.TokenManager do
              refreshed_tokens.refresh_token,
              refreshed_tokens.refresh_token_expires_at
            ) do
+      Logger.info("Access token refreshed.")
+
+      Logger.info("Making sure websocket is started.")
+      Task.start(fn -> WebsocketStarter.start_websocket() end)
+
       {:ok, claims} = verify_tokens(refreshed_tokens)
       refresh_in = TokenRefresher.calculate_time_until_refresh(claims)
-      Logger.info("Access token refreshed. Will refresh again in #{refresh_in} seconds.")
+      Logger.info("Will refresh access token again in #{refresh_in} seconds.")
 
       schedule_refresh(refresh_in)
     else
