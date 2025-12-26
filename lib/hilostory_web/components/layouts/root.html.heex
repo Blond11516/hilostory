@@ -9,8 +9,8 @@
     <.live_title suffix=" · Phoenix Framework">
       {assigns[:page_title] || "Hilostory"}
     </.live_title>
-    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/#{"app-" <> Application.get_env(:hilostory, :release) <> ".css"}"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/#{"app-" <> Application.get_env(:hilostory, :release) <> ".js"}"}>
     </script>
   </head>
   <body>

@@ -25,7 +25,7 @@ config :hilostory, HilostoryWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "7EvBryCwLoDnnikVvkZ+NDiVSU37A1uumuTVM5/wxTm7b6yCpDHVeiQ5XLNrCosY",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:hilostory, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:hilostory, ~w(--watch)]}
   ]
 
 # Watch static and templates for browser reloading.

@@ -21,10 +21,11 @@ config :esbuild,
         ts/app.ts
         --bundle
         --target=es2022
-        --outdir=../priv/static/assets
+        --outfile=../priv/static/assets/app-#{release}.js
         --external:/fonts/*
         --external:/images/*
         --alias:@=.
+        --sourcemap
         --define:process.env.HILOSTORY_RELEASE='#{release}'
         ),
     cd: Path.expand("../assets", __DIR__),
@@ -41,6 +42,8 @@ config :hilostory, HilostoryWeb.Endpoint,
   ],
   pubsub_server: Hilostory.PubSub,
   live_view: [signing_salt: "LhqlKPMy"]
+
+config :hilostory, :release, release
 
 config :hilostory,
   ecto_repos: [Hilostory.Repo],
