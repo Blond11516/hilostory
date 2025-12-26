@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+release = "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
+
 config :cloak, json_library: JSON
 
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
@@ -15,8 +17,16 @@ config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 config :esbuild,
   version: "0.27.0",
   hilostory: [
-    args:
-      ~w(ts/app.ts --bundle --target=es2022 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --alias:@=.),
+    args: ~w(
+        ts/app.ts
+        --bundle
+        --target=es2022
+        --outdir=../priv/static/assets
+        --external:/fonts/*
+        --external:/images/*
+        --alias:@=.
+        --define:process.env.HILOSTORY_RELEASE='#{release}'
+        ),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
@@ -52,7 +62,7 @@ config :sentry,
   client: Hilostory.Sentry.FinchClient,
   enable_source_code_context: true,
   root_source_code_paths: [File.cwd!()],
-  release: "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
+  release: release
 
 config :tesla, JokenJwks.HttpFetcher, adapter: {Tesla.Adapter.Finch, name: :joken_jwks_client}
 
