@@ -28,6 +28,9 @@ import "../css/app.css";
 import "uplot/dist/uPlot.min.css";
 import Chart from "./chart_hook";
 import PushTimeZone from "./push_time_zone_hook";
+import { initializeSentry } from "./sentry";
+
+initializeSentry();
 
 const csrfToken = (
 	document.querySelector("meta[name='csrf-token']") as HTMLElement
