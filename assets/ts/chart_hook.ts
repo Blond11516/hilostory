@@ -13,6 +13,7 @@ const sync = uPlot.sync("chartsSync");
 
 class Chart extends ViewHook {
 	private chart?: uPlot;
+	private resizeObserver?: ResizeObserver;
 
 	override mounted() {
 		// biome-ignore lint/style/noNonNullAssertion: Hook is only used once on elements know to have this attribute
@@ -82,6 +83,9 @@ class Chart extends ViewHook {
 		const plot = new uPlot(opts, data, chartContainer);
 		this.chart = plot;
 		sync.sub(plot);
+
+		this.resizeObserver = new ResizeObserver(this.handleResize.bind(this));
+		this.resizeObserver.observe(chartContainer);
 	}
 
 	override updated() {
@@ -96,6 +100,29 @@ class Chart extends ViewHook {
 		if (this.chart) {
 			sync.unsub(this.chart);
 		}
+		if (this.resizeObserver) {
+			this.resizeObserver.disconnect();
+		}
+	}
+
+	private handleResize(
+		entries: ResizeObserverEntry[],
+		_observer: ResizeObserver,
+	) {
+		if (this.chart === undefined) {
+			return;
+		}
+
+		if (entries.length !== 1) {
+			console.error("Received a resize event with number of entries != 1");
+		}
+
+		// biome-ignore lint/style/noNonNullAssertion: Length was asserted just before
+		const entry = entries[0]!;
+		this.chart.setSize({
+			width: entry.contentRect.width,
+			height: this.chart.height,
+		});
 	}
 }
 

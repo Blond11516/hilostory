@@ -10,3 +10,7 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+.chart-container {
+	overflow: hidden;
+}

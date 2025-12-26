@@ -75,7 +75,12 @@ defmodule HilostoryWeb.HomeLive do
 
       <button phx-click="refresh">Refresh</button>
       <div class="chart-grid">
-        <div :for={device <- devices} id={"chart-#{device.name}"} phx-update="ignore" />
+        <div
+          :for={device <- devices}
+          id={"chart-#{device.name}"}
+          class="chart-container"
+          phx-update="ignore"
+        />
       </div>
     </.async_result>
     <.async_result :let={devices_data} :if={@devices_data != nil} assign={@devices_data}>
