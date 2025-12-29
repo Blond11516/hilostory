@@ -49,7 +49,6 @@ RUN mkdir assets
 COPY assets/package.json assets/bun.lock assets/
 RUN cd assets && bun install --frozen-lockfile
 
-
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
 # to be re-compiled.
