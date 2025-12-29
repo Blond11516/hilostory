@@ -49,7 +49,6 @@ RUN mkdir assets
 COPY assets/package.json assets/bun.lock assets/
 RUN cd assets && bun install --frozen-lockfile
 
-ARG RELEASE
 
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
@@ -67,6 +66,7 @@ COPY assets assets
 # Compile the release
 RUN mix compile
 
+ARG RELEASE
 RUN echo ${RELEASE} > priv/release.txt
 
 # compile assets
