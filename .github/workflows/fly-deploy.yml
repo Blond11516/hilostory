@@ -15,9 +15,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: superfly/flyctl-actions/setup-flyctl@v1
-      - run: flyctl deploy --remote-only --build-arg=RELEASE=${{ github.sha }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -26,3 +23,6 @@ jobs:
         with:
           environment: production
           release: ${{ github.sha }}
+      - run: flyctl deploy --remote-only --build-arg=RELEASE=${{ github.sha }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
