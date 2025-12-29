@@ -67,6 +67,8 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :sentry, release: :hilostory |> :code.priv_dir() |> Path.join("release.txt") |> File.read!()
+
   config :tower_sentry, dsn: System.fetch_env!("SENTRY_DSN")
 
   # ## SSL Support
@@ -100,4 +102,8 @@ if config_env() == :prod do
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
+end
+
+if config_env() == :dev do
+  config :sentry, release: "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
 end

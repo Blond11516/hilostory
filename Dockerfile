@@ -67,6 +67,8 @@ COPY assets assets
 # Compile the release
 RUN mix compile
 
+RUN echo ${RELEASE} > priv/release.txt
+
 # compile assets
 RUN mix assets.deploy
 

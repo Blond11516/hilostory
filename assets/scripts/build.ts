@@ -1,10 +1,18 @@
+import { $ } from "bun";
 import esbuild, { type BuildOptions } from "esbuild";
 
 const args = process.argv.slice(2);
 const watch = args.includes("--watch");
 const deploy = args.includes("--deploy");
 
-const mixBuildPath = `../_build/${process.env.MIX_ENV ?? "dev"}`;
+const MIX_ENV = process.env.MIX_ENV ?? "dev";
+const mixBuildPath = `../_build/${MIX_ENV}`;
+
+const release = (
+	MIX_ENV === "prod"
+		? await Bun.file("../priv/release.txt").text()
+		: await $`git rev-parse HEAD`.text()
+).trim();
 
 const loader: BuildOptions["loader"] = {
 	// Add loaders for images/fonts/etc, e.g. { '.svg': 'file' }
@@ -24,7 +32,7 @@ let opts: BuildOptions = {
 	external: ["fonts/*", "images/*"],
 	alias: { "@": "." },
 	sourcemap: true,
-	define: { "process.env.HILOSTORY_RELEASE": "'release'" },
+	define: { "process.env.HILOSTORY_RELEASE": `'${release}'` },
 	nodePaths: ["../deps", mixBuildPath],
 	tsconfig: "./ts/tsconfig.json",
 	loader: loader,

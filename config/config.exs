@@ -7,8 +7,6 @@
 # General application configuration
 import Config
 
-release = System.get_env("RELEASE") || "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
-
 config :cloak, json_library: JSON
 
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
@@ -43,8 +41,7 @@ config :postgrex, json_librar: JSON
 config :sentry,
   client: Hilostory.Sentry.FinchClient,
   enable_source_code_context: true,
-  root_source_code_paths: [File.cwd!()],
-  release: release
+  root_source_code_paths: [File.cwd!()]
 
 config :tesla, JokenJwks.HttpFetcher, adapter: {Tesla.Adapter.Finch, name: :joken_jwks_client}
 
