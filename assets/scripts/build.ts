@@ -1,12 +1,8 @@
-import { $ } from "bun";
 import esbuild, { type BuildOptions } from "esbuild";
 
 const args = process.argv.slice(2);
 const watch = args.includes("--watch");
 const deploy = args.includes("--deploy");
-
-const release =
-	process.env.RELEASE ?? (await $`git rev-parse HEAD`.quiet().text()).trim();
 
 const mixBuildPath = `../_build/${process.env.MIX_ENV ?? "dev"}`;
 
@@ -24,7 +20,7 @@ let opts: BuildOptions = {
 	bundle: true,
 	logLevel: "debug",
 	target: "es2022",
-	outfile: `../priv/static/assets/app-${release}.js`,
+	outdir: "../priv/static/assets",
 	external: ["fonts/*", "images/*"],
 	alias: { "@": "." },
 	sourcemap: true,

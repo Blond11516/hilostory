@@ -24,8 +24,6 @@ config :hilostory, HilostoryWeb.Endpoint,
   pubsub_server: Hilostory.PubSub,
   live_view: [signing_salt: "LhqlKPMy"]
 
-config :hilostory, :release, release
-
 config :hilostory,
   ecto_repos: [Hilostory.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true],
