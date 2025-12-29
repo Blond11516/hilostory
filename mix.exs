@@ -39,7 +39,6 @@ defmodule Hilostory.MixProject do
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
       {:ecto_sql, "3.13.3"},
-      {:esbuild, "0.10.0", runtime: Mix.env() == :dev},
       {:finch, "0.20.0"},
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
@@ -79,10 +78,10 @@ defmodule Hilostory.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["esbuild.install --if-missing", "cmd --cd assets bun install"],
-      "assets.build": ["esbuild hilostory"],
+      "assets.setup": ["cmd --cd assets bun install"],
+      "assets.build": ["cmd --cd assets bun scripts/build.ts --deploy"],
       "assets.deploy": [
-        "esbuild hilostory --minify",
+        "cmd --cd assets bun scripts/build.ts --deploy",
         "phx.digest"
       ]
     ]

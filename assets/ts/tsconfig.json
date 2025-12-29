@@ -4,10 +4,11 @@
 		"baseUrl": ".",
 		"paths": {
 			"phoenix_live_view": [
-				"../deps/phoenix_live_view/assets/js/types/index.d.ts"
+				"../../deps/phoenix_live_view/assets/js/types/index.d.ts"
 			]
 		},
 		"erasableSyntaxOnly": true,
-		"lib": ["es2022", "dom", "dom.iterable"]
+		"lib": ["es2022", "dom", "dom.iterable"],
+		"types": ["@types/phoenix"]
 	}
 }

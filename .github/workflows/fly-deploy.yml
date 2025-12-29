@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - run: flyctl deploy --remote-only --build-arg=RELEASE=${{ github.sha }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - uses: getsentry/action-release@v1
@@ -25,3 +25,4 @@ jobs:
           SENTRY_PROJECT: hilostory
         with:
           environment: production
+          release: ${{ github.sha }}

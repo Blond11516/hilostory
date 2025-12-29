@@ -7,30 +7,11 @@
 # General application configuration
 import Config
 
-release = "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
+release = System.get_env("RELEASE") || "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
 
 config :cloak, json_library: JSON
 
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
-
-# Configure esbuild (the version is required)
-config :esbuild,
-  version: "0.27.0",
-  hilostory: [
-    args: ~w(
-        ts/app.ts
-        --bundle
-        --target=es2022
-        --outfile=../priv/static/assets/app-#{release}.js
-        --external:/fonts/*
-        --external:/images/*
-        --alias:@=.
-        --sourcemap
-        --define:process.env.HILOSTORY_RELEASE='#{release}'
-        ),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
-  ]
 
 # Configures the endpoint
 config :hilostory, HilostoryWeb.Endpoint,

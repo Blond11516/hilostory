@@ -37,22 +37,24 @@ ARG BUN_VERSION
 RUN apk update && apk add curl unzip bash && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v${BUN_VERSION}"
 
-# install node modules
-RUN mkdir assets
-COPY assets/package.json assets/bun.lock assets/
-RUN cd assets && bun install --production --frozen-lockfile
-
 # set build ENV
 ENV MIX_ENV="prod"
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
 RUN mix deps.get --only $MIX_ENV
-RUN mkdir config
+
+# install node modules
+RUN mkdir assets
+COPY assets/package.json assets/bun.lock assets/
+RUN cd assets && bun install --frozen-lockfile
+
+ARG RELEASE
 
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
 # to be re-compiled.
+RUN mkdir config
 COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
