@@ -1,5 +1,3 @@
-- Move release to runtime.exs so we don't have to recompile dependencies every time
-  - Probably need to migrate esbuild to a build script so it can load the release without dependening on mix config
 - Don't hardcode location id in websocket supervisor
 - aller chercher les devices via l'api REST
 - protéger l'interface web avec un mot de passe
