@@ -56,7 +56,7 @@ defmodule Hilostory.MixProject do
       {:typed_struct, "0.3.0"},
       {:tz, "0.28.1"},
       {:websockex, "0.5.1"},
-      {:zoi, "0.10.6"},
+      {:zoi, "0.14.0"},
       {:live_debugger, "0.5.0", only: [:dev]},
       {:phoenix_live_reload, "1.6.2", only: :dev},
       {:igniter, "0.7.0", only: :dev},
