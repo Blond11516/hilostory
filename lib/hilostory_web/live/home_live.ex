@@ -93,6 +93,8 @@ defmodule HilostoryWeb.HomeLive do
           phx-hook="Chart"
           data-data={device_data}
           data-device-name={device.name}
+          data-start-date={get_current_period(@period, @time_zone) |> elem(0) |> present_date_time()}
+          data-end-date={get_current_period(@period, @time_zone) |> elem(1) |> present_date_time()}
         />
       </div>
     </.async_result>
@@ -270,19 +272,19 @@ defmodule HilostoryWeb.HomeLive do
       |> DeviceValueRepository.fetch(device_id, period)
       |> Enum.map(fn %Reading{} = reading -> %{reading | value: DeviceValue.normalized(reading.value)} end)
 
-    timestamps = MapSet.new(readings, fn %Reading{} = reading -> DateTime.to_unix(reading.timestamp) end)
+    timestamps = MapSet.new(readings, fn %Reading{} = reading -> present_date_time(reading.timestamp) end)
 
     readings_by_type = Enum.group_by(readings, fn %Reading{} = reading -> reading.value.type end)
 
     power_values =
       readings_by_type
       |> Map.get(:power, [])
-      |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
+      |> Map.new(fn %Reading{} = reading -> {present_date_time(reading.timestamp), reading.value.value} end)
 
     temperature_values =
       readings_by_type
       |> Map.get(:ambient_temperature, [])
-      |> Map.new(fn %Reading{} = reading -> {DateTime.to_unix(reading.timestamp), reading.value.value} end)
+      |> Map.new(fn %Reading{} = reading -> {present_date_time(reading.timestamp), reading.value.value} end)
 
     target_temperature_values =
       readings_by_type
@@ -300,4 +302,6 @@ defmodule HilostoryWeb.HomeLive do
     end)
     |> JSON.encode!()
   end
+
+  defp present_date_time(%DateTime{} = dt), do: DateTime.to_unix(dt, :second)
 end

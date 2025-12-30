@@ -16,7 +16,7 @@ class Chart extends ViewHook {
 	private resizeObserver?: ResizeObserver;
 
 	override mounted() {
-		// biome-ignore lint/style/noNonNullAssertion: Hook is only used once on elements know to have this attribute
+		// biome-ignore lint/style/noNonNullAssertion: Hook is only used once on elements known to have this attribute
 		const deviceName = this.el.getAttribute("data-device-name")!;
 		// biome-ignore lint/style/noNonNullAssertion: App is known to have this element
 		const chartContainer = document.getElementById(`chart-${deviceName}`)!;
@@ -72,6 +72,18 @@ class Chart extends ViewHook {
 					values: (_self, ticks) => ticks.map((it) => `${it} C`),
 				},
 			],
+			scales: {
+				x: {
+					range: () => {
+						const { startDate, endDate } = this.parseDates();
+
+						return [
+							this.dateToEpochSeconds(startDate),
+							this.dateToEpochSeconds(endDate),
+						];
+					},
+				},
+			},
 			cursor: {
 				sync: {
 					key: sync.key,
@@ -123,6 +135,23 @@ class Chart extends ViewHook {
 			width: entry.contentRect.width,
 			height: this.chart.height,
 		});
+	}
+
+	private parseDates() {
+		const startDate = new Date(
+			// biome-ignore lint/style/noNonNullAssertion: Element is known to have this data attribute
+			Number.parseInt(this.el.dataset.startDate!, 10) * 1000,
+		);
+		const endDate = new Date(
+			// biome-ignore lint/style/noNonNullAssertion: Element is known to have this data attribute
+			Number.parseInt(this.el.dataset.endDate!, 10) * 1000,
+		);
+
+		return { startDate, endDate };
+	}
+
+	private dateToEpochSeconds(date: Date): number {
+		return date.valueOf() / 1000;
 	}
 }
 
