@@ -42,7 +42,7 @@ defmodule Hilostory.MixProject do
       {:finch, "0.20.0"},
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
-      {:phoenix, "1.8.1"},
+      {:phoenix, "1.8.3"},
       {:phoenix_ecto, "4.7.0"},
       {:phoenix_html, "4.3.0"},
       {:phoenix_live_dashboard, "0.8.7"},
