@@ -34,7 +34,7 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "1.9.0"},
+      {:bandit, "1.10.0"},
       {:castore, "1.0.17"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
