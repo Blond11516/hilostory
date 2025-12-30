@@ -38,7 +38,7 @@ defmodule Hilostory.MixProject do
       {:castore, "1.0.17"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
-      {:ecto_sql, "3.13.3"},
+      {:ecto_sql, "3.13.4"},
       {:finch, "0.20.0"},
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
