@@ -34,7 +34,7 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "1.10.0"},
+      {:bandit, "1.10.1"},
       {:castore, "1.0.17"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
@@ -46,9 +46,9 @@ defmodule Hilostory.MixProject do
       {:phoenix_ecto, "4.7.0"},
       {:phoenix_html, "4.3.0"},
       {:phoenix_live_dashboard, "0.8.7"},
-      {:phoenix_live_view, "1.1.19"},
-      {:postgrex, "0.21.1"},
-      {:req, "0.5.16"},
+      {:phoenix_live_view, "1.1.20"},
+      {:postgrex, "0.22.0"},
+      {:req, "0.5.17"},
       {:telemetry_metrics, "1.1.0"},
       {:telemetry_poller, "1.3.0"},
       {:tower_sentry, "0.3.5"},
@@ -56,11 +56,11 @@ defmodule Hilostory.MixProject do
       {:typed_struct, "0.3.0"},
       {:tz, "0.28.1"},
       {:websockex, "0.5.1"},
-      {:zoi, "0.14.0"},
-      {:live_debugger, "0.5.0", only: [:dev]},
+      {:zoi, "0.15.0"},
+      {:live_debugger, "0.5.1", only: [:dev]},
       {:phoenix_live_reload, "1.6.2", only: :dev},
       {:igniter, "0.7.0", only: :dev},
-      {:styler, "1.10.0", only: [:dev, :test], runtime: false},
+      {:styler, "1.10.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.7", only: [:dev, :test], runtime: false},
       {:lazy_html, "0.1.8", only: :test}
     ]
