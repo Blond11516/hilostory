@@ -8,12 +8,11 @@ defmodule Hilostory.Application do
   @impl Application
   def start(_type, _args) do
     start_app = Application.get_env(:hilostory, :start_app, true)
+    env = Application.get_env(:hilostory, :env)
 
     children =
-      [
-        HilostoryWeb.Telemetry,
-        Hilostory.Repo
-      ]
+      [HilostoryWeb.Telemetry]
+      |> append_if(env != :test, Hilostory.Repo)
       |> append_if(start_app, [
         {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
         Hilostory.Joken.HiloStrategy,

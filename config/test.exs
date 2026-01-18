@@ -8,7 +8,7 @@ import Config
 config :hilostory, Hilostory.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost",
+  hostname: System.get_env("POSTGRES_HOSTNAME", "localhost"),
   database: "hilostory_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2

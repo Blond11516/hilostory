@@ -6,10 +6,56 @@ on:
     branches:
       - main
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: timescale/timescaledb-ha:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hilostory_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      ERLANG_VERSION: 28.3.1
+      ELIXIR_VERSION: 1.19.5-otp-28
+      MIX_ENV: test
+      HILO_TOKENS_ENCRYPTION_KEY: PvCTwQJp9ka2eW7GvlWLdhLUtlh0ZpfUiwrCUxQdZGI=
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v5
+        id: deps-cache
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix
+
+      - uses: actions/cache@v5
+        id: build-cache
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-${{ env.ERLANG_VERSION }}-${{ env.ELIXIR_VERSION }}
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.ERLANG_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+
+      - run: mix deps.get --check-locked
+      - run: mix deps.compile
+      - run: mix compile
+      - run: mix test
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
     concurrency: deploy-group # optional: ensure only one action runs at a time
+    needs: test
     steps:
       - uses: actions/checkout@v6
         with:
