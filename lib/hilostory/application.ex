@@ -17,16 +17,18 @@ defmodule Hilostory.Application do
       |> append_if(start_app, [
         {Finch, name: :joken_jwks_client, pools: %{default: [size: 1, count: 1]}},
         Hilostory.Joken.HiloStrategy,
-        Hilostory.TokenManager,
         {Phoenix.PubSub, name: Hilostory.PubSub},
         Hilostory.Vault,
-        Hilostory.WebsocketSupervisor,
-        Hilostory.WebsocketStarter,
         HilostoryWeb.Endpoint
       ])
       |> append_if(
         start_app and Application.get_env(:hilostory, :env) != :test,
-        {Tz.UpdatePeriodically, []}
+        [
+          Hilostory.TokenManager,
+          Hilostory.WebsocketSupervisor,
+          Hilostory.WebsocketStarter,
+          {Tz.UpdatePeriodically, []}
+        ]
       )
 
     # Start a worker by calling: Hilostory.Worker.start_link(arg)

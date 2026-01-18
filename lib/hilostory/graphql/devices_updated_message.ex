@@ -39,10 +39,8 @@ defmodule Hilostory.Graphql.DevicesUpdatedMessage do
   def values(message) when is_map(message) do
     [
       {:power, get_in(message, ["data", "onAnyDeviceUpdated", "device", "power"])},
-      {:ambient_temperature,
-       get_in(message, ["data", "onAnyDeviceUpdated", "device", "ambientTemperature"])},
-      {:ambient_temperature_setpoint,
-       get_in(message, ["data", "onAnyDeviceUpdated", "device", "ambientTempSetpoint"])}
+      {:ambient_temperature, get_in(message, ["data", "onAnyDeviceUpdated", "device", "ambientTemperature"])},
+      {:ambient_temperature_setpoint, get_in(message, ["data", "onAnyDeviceUpdated", "device", "ambientTempSetpoint"])}
     ]
     |> Enum.filter(fn {_, value} -> value != nil end)
     |> Enum.map(fn {type, value} ->

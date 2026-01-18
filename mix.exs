@@ -62,7 +62,8 @@ defmodule Hilostory.MixProject do
       {:igniter, "0.7.0", only: :dev},
       {:styler, "1.10.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.7", only: [:dev, :test], runtime: false},
-      {:lazy_html, "0.1.8", only: :test}
+      {:lazy_html, "0.1.8", only: :test},
+      {:patch, "0.16.0", only: [:dev, :test]}
     ]
   end
 
