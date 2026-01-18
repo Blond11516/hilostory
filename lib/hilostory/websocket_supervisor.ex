@@ -2,8 +2,7 @@ defmodule Hilostory.WebsocketSupervisor do
   @moduledoc false
   use DynamicSupervisor
 
-  alias Hilostory.Graphql.Subscription
-  alias Hilostory.Graphql.SubscriptionQuery
+  alias Hilostory.DeviceUpdateListener
   alias Hilostory.SupervisorChildStartErrorLogger
 
   def start_link(_) do
@@ -18,50 +17,7 @@ defmodule Hilostory.WebsocketSupervisor do
   def start_websocket do
     DynamicSupervisor.start_child(
       __MODULE__,
-      SupervisorChildStartErrorLogger.child_spec(Subscription, %{
-        subscription: devices_subscription()
-      })
+      SupervisorChildStartErrorLogger.child_spec(DeviceUpdateListener, nil)
     )
-  end
-
-  defp devices_subscription do
-    %SubscriptionQuery{
-      query: """
-      subscription onAnyDeviceUpdated($locationHiloId: String!) {
-          onAnyDeviceUpdated(locationHiloId: $locationHiloId) {
-              locationHiloId
-              transmissionTime
-              device {
-                  ... on BasicSmartMeter {
-                      deviceType
-                      hiloId
-                      power {
-                          value
-                          kind
-                      }
-                  }
-                  ... on BasicThermostat {
-                      deviceType
-                      hiloId
-                      ambientTemperature {
-                          value
-                          kind
-                      }
-                      ambientTempSetpoint {
-                          value
-                          kind
-                      }
-                      power {
-                          value
-                          kind
-                      }
-                  }
-              }
-          }
-      }
-      """,
-      operation_name: "onAnyDeviceUpdated",
-      variables: %{"locationHiloId" => "urn:hilo:crm:4594276-s3h2l9:0"}
-    }
   end
 end

@@ -2,38 +2,20 @@ defmodule Hilostory.Graphql.Subscription do
   @moduledoc false
   use WebSockex
 
-  alias Hilostory.DeviceValue.Reading
-  alias Hilostory.Graphql.DevicesUpdatedMessage
   alias Hilostory.Graphql.Message
   alias Hilostory.Graphql.SubscriptionQuery
-  alias Hilostory.Infrastructure.DeviceValueRepository
-  alias Hilostory.Infrastructure.OauthTokensRepository
 
   require Logger
 
-  def start_link(%{subscription: subscription}) do
+  def start_link(%{subscription: %SubscriptionQuery{} = subscription, url: %URI{} = url, handle_next: handle_next})
+      when is_function(handle_next) do
     Logger.info("Starting GraphQL subscription")
 
-    case OauthTokensRepository.get() do
-      nil ->
-        {:error, "No OAuth token found"}
-
-      tokens ->
-        {:ok, websockex_pid} =
-          "wss://platform.hiloenergie.com"
-          |> URI.parse()
-          |> URI.append_path("/api")
-          |> URI.append_path("/digital-twin")
-          |> URI.append_path("/v3")
-          |> URI.append_path("/graphql")
-          |> URI.append_query(URI.encode_query(%{"access_token" => tokens.access_token}))
-          |> URI.to_string()
-          |> WebSockex.start_link(__MODULE__, subscription,
-            extra_headers: [{"Sec-WebSocket-Protocol", "graphql-transport-ws"}]
-          )
-
-        {:ok, websockex_pid}
-    end
+    url
+    |> URI.to_string()
+    |> WebSockex.start_link(__MODULE__, {subscription, handle_next},
+      extra_headers: [{"Sec-WebSocket-Protocol", "graphql-transport-ws"}]
+    )
   end
 
   @impl WebSockex
@@ -61,12 +43,12 @@ defmodule Hilostory.Graphql.Subscription do
     {:reply, message, state}
   end
 
-  def handle_cast(:subscribe, %SubscriptionQuery{} = subscription_query) do
+  def handle_cast(:subscribe, {%SubscriptionQuery{} = subscription_query, _} = state) do
     message = {:text, Message.subscribe(subscription_query)}
 
     Logger.debug("Sending websocket frame to subscribe to #{subscription_query.operation_name}: #{inspect(message)}")
 
-    {:reply, message, subscription_query}
+    {:reply, message, state}
   end
 
   def handle_cast(:pong, state) do
@@ -78,7 +60,7 @@ defmodule Hilostory.Graphql.Subscription do
   end
 
   @impl WebSockex
-  def handle_frame(frame, state) do
+  def handle_frame(frame, {_, handle_next} = state) do
     Logger.debug("Received frame #{inspect(frame)}")
 
     {:text, frame_text} = frame
@@ -86,7 +68,7 @@ defmodule Hilostory.Graphql.Subscription do
     frame_text
     |> Message.from_websocket_frame()
     |> tap(&Logger.debug("Decoded message #{inspect(&1)}"))
-    |> handle_message()
+    |> handle_message(handle_next)
 
     {:ok, state}
   end
@@ -98,38 +80,26 @@ defmodule Hilostory.Graphql.Subscription do
     :ok
   end
 
-  defp handle_message(%Message{type: "connection_ack"}) do
+  defp handle_message(%Message{type: "connection_ack"}, _handle_next) do
     WebSockex.cast(self(), :subscribe)
   end
 
-  defp handle_message(%Message{type: "ping"}) do
+  defp handle_message(%Message{type: "ping"}, _handle_next) do
     WebSockex.cast(self(), :pong)
   end
 
-  defp handle_message(%Message{type: "next"} = message) do
+  defp handle_message(%Message{type: "next"} = message, handle_next) do
     Logger.info("Received next message")
     Logger.debug("Raw message: #{inspect(message)}")
 
-    {:ok, payload} = Zoi.parse(DevicesUpdatedMessage.schema(), message.payload)
-    Logger.debug("Parsed message: #{inspect(payload)}")
-
-    device_id = DevicesUpdatedMessage.device_id(payload)
-    values = DevicesUpdatedMessage.values(payload)
-    timestamp = DevicesUpdatedMessage.timestamp(payload)
-
-    Logger.info("Inserting values for device \"#{device_id}\" at timestamp #{timestamp}")
-    Logger.debug("Inserting values #{inspect(values)}")
-
-    values
-    |> Enum.map(fn value -> %Reading{timestamp: timestamp, value: value} end)
-    |> DeviceValueRepository.upsert(device_id)
+    handle_next.(message.payload)
   end
 
-  defp handle_message(%Message{type: "error"} = message) do
+  defp handle_message(%Message{type: "error"} = message, _handle_next) do
     Logger.error("Received error message: #{inspect(message)}")
   end
 
-  defp handle_message(%Message{} = message) do
+  defp handle_message(%Message{} = message, _handle_next) do
     Logger.warning("Received unexpected message with type #{message.type}")
   end
 end
