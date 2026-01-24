@@ -55,6 +55,7 @@ defmodule Hilostory.MixProject do
       {:timescale, "0.1.1"},
       {:typed_struct, "0.3.0"},
       {:tz, "0.28.1"},
+      {:tz_extra, "0.45.0"},
       {:websockex, "0.5.1"},
       {:zoi, "0.16.1"},
       {:live_debugger, "0.5.1", only: [:dev]},

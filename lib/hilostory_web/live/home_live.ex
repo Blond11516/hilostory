@@ -22,6 +22,7 @@ defmodule HilostoryWeb.HomeLive do
       |> assign(period: {:predefined, :last_hour})
       |> assign(pending_custom_period?: false)
       |> assign(predefined_periods: @predefined_periods)
+      |> assign(default_timezone: "America/Toronto")
       |> assign(time_zone: nil)
 
     {:ok, socket}
@@ -36,6 +37,16 @@ defmodule HilostoryWeb.HomeLive do
 
     <form phx-submit="period-submitted" phx-change="period-changed">
       <div>Select data period to display</div>
+      <label for="timezone-picker">Timezone</label>
+      <select id="timezone-picker" name="timezone">
+        <option
+            :for={timezone <- TzExtra.time_zone_ids()}
+            value={timezone}
+            selected={(@time_zone == nil and @default_timezone == timezone) or @time_zone == timezone }
+        >
+            {timezone}
+        </option>
+      </select>
       <label for="period-type-input">Period</label>
       <select id="period-type-input" name="period-type">
         <option
@@ -56,7 +67,7 @@ defmodule HilostoryWeb.HomeLive do
         id="datetime-start-input"
         name="start"
         disabled={not match?({:custom, _}, @period) and not @pending_custom_period?}
-        value={format_date_time_for_input(@period, :start, @time_zone)}
+        value={format_date_time_for_input(@period, :start, timezone(assigns))}
       />
       <label for="datetime-end-input">To</label>
       <input
@@ -64,7 +75,7 @@ defmodule HilostoryWeb.HomeLive do
         id="datetime-end-input"
         name="end"
         disabled={not match?({:custom, _}, @period) and not @pending_custom_period?}
-        value={format_date_time_for_input(@period, :end, @time_zone)}
+        value={format_date_time_for_input(@period, :end, timezone(assigns))}
       />
       <button type="submit">Apply</button>
     </form>
@@ -93,8 +104,12 @@ defmodule HilostoryWeb.HomeLive do
           phx-hook="Chart"
           data-data={device_data}
           data-device-name={device.name}
-          data-start-date={get_current_period(@period, @time_zone) |> elem(0) |> present_date_time()}
-          data-end-date={get_current_period(@period, @time_zone) |> elem(1) |> present_date_time()}
+          data-start-date={
+            get_current_period(@period, timezone(assigns)) |> elem(0) |> present_date_time()
+          }
+          data-end-date={
+            get_current_period(@period, timezone(assigns)) |> elem(1) |> present_date_time()
+          }
         />
       </div>
     </.async_result>
@@ -107,12 +122,13 @@ defmodule HilostoryWeb.HomeLive do
   end
 
   def handle_event("period-submitted", params, socket) do
-    period = parse_updated_period(params, socket.assigns.time_zone)
+    period = parse_updated_period(params, timezone(socket.assigns))
 
     socket =
       socket
       |> assign(period: period)
       |> assign(pending_custom_period?: false)
+      |> assign(time_zone: params["timezone"])
       |> refresh()
 
     {:noreply, socket}
@@ -122,19 +138,22 @@ defmodule HilostoryWeb.HomeLive do
     {:noreply, assign(socket, pending_custom_period?: params["period-type"] == "custom")}
   end
 
-  def handle_event("set-timezone", params, socket) do
+  def handle_event("set-default-timezone", params, socket) do
     time_zone = params["time-zone"]
 
     period =
       case socket.assigns.period do
-        {:custom, _} -> {:custom, get_current_period(socket.assigns.period, time_zone)}
-        period -> period
+        {:custom, _} ->
+          {:custom, get_current_period(socket.assigns.period, timezone(%{socket.assigns | default_timezone: time_zone}))}
+
+        period ->
+          period
       end
 
     socket =
       socket
       |> assign(period: period)
-      |> assign(time_zone: time_zone)
+      |> assign(default_timezone: time_zone)
       |> start_async(:fetch_devices, &fetch_devices/0)
 
     {:noreply, socket}
@@ -144,7 +163,7 @@ defmodule HilostoryWeb.HomeLive do
   def handle_async(:fetch_devices, result, socket) do
     case result do
       {:ok, devices} ->
-        period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
+        period = get_current_period(socket.assigns.period, timezone(socket.assigns))
 
         socket =
           socket
@@ -230,7 +249,7 @@ defmodule HilostoryWeb.HomeLive do
 
   defp refresh(socket) do
     devices = socket.assigns.devices.result
-    period = get_current_period(socket.assigns.period, socket.assigns.time_zone)
+    period = get_current_period(socket.assigns.period, timezone(socket.assigns))
 
     assign_async(socket, :devices_data, fn -> fetch_data(devices, period) end)
   end
@@ -304,4 +323,11 @@ defmodule HilostoryWeb.HomeLive do
   end
 
   defp present_date_time(%DateTime{} = dt), do: DateTime.to_unix(dt, :second)
+
+  defp timezone(assigns) do
+    case assigns.time_zone do
+      nil -> assigns.default_timezone
+      timezone -> timezone
+    end
+  end
 end

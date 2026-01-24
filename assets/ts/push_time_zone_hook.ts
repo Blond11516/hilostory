@@ -11,7 +11,7 @@ class PushTimeZone extends ViewHook {
 
 	private pushTimezone() {
 		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		this.pushEvent("set-timezone", { "time-zone": timeZone });
+		this.pushEvent("set-default-timezone", { "time-zone": timeZone });
 	}
 }
 
