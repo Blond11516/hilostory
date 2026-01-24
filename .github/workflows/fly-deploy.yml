@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Check if changes require a deployment
         run: |
@@ -90,7 +90,7 @@ jobs:
           )
 
           # Get the list of changed files
-          diff=$(git diff --name-only HEAD~1 HEAD)
+          diff=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
 
           # Check for matches with grep directly
           grep_regex="^($joined_paths)"
