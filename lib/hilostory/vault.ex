@@ -12,7 +12,9 @@ defmodule Hilostory.Vault do
       Keyword.put(config, :ciphers,
         default: {
           Cloak.Ciphers.AES.GCM,
-          tag: "AES.GCM.V1", key: "HILO_TOKENS_ENCRYPTION_KEY" |> System.fetch_env!() |> Base.decode64!(), iv_length: 12
+          tag: "AES.GCM.V1",
+          key: :hilostory |> Application.get_env(:hilo_tokens_encryption_key) |> Base.decode64!(),
+          iv_length: 12
         }
       )
 

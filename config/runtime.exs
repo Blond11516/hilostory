@@ -107,3 +107,8 @@ end
 if config_env() == :dev do
   config :sentry, release: "git" |> System.cmd(["rev-parse", "HEAD"]) |> elem(0) |> String.trim()
 end
+
+case config_env() do
+  :test -> config :hilostory, :hilo_tokens_encryption_key, "PvCTwQJp9ka2eW7GvlWLdhLUtlh0ZpfUiwrCUxQdZGI="
+  _ -> config :hilostory, :hilo_tokens_encryption_key, System.fetch_env!("HILO_TOKENS_ENCRYPTION_KEY")
+end

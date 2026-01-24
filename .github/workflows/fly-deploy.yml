@@ -25,7 +25,6 @@ jobs:
       ERLANG_VERSION: 28.3.1
       ELIXIR_VERSION: 1.19.5-otp-28
       MIX_ENV: test
-      HILO_TOKENS_ENCRYPTION_KEY: PvCTwQJp9ka2eW7GvlWLdhLUtlh0ZpfUiwrCUxQdZGI=
     steps:
       - uses: actions/checkout@v6
 
