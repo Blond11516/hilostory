@@ -34,12 +34,12 @@ defmodule Hilostory.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "1.10.1"},
+      {:bandit, "1.10.2"},
       {:castore, "1.0.17"},
       {:cloak, "1.1.4"},
       {:cloak_ecto, "1.3.0"},
       {:ecto_sql, "3.13.4"},
-      {:finch, "0.20.0"},
+      {:finch, "0.21.0"},
       {:joken, "2.6.2"},
       {:joken_jwks, "1.7.0"},
       {:phoenix, "1.8.3"},
@@ -56,10 +56,10 @@ defmodule Hilostory.MixProject do
       {:typed_struct, "0.3.0"},
       {:tz, "0.28.1"},
       {:websockex, "0.5.1"},
-      {:zoi, "0.15.0"},
+      {:zoi, "0.16.1"},
       {:live_debugger, "0.5.1", only: [:dev]},
       {:phoenix_live_reload, "1.6.2", only: :dev},
-      {:igniter, "0.7.0", only: :dev},
+      {:igniter, "0.7.1", only: :dev},
       {:styler, "1.10.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.7", only: [:dev, :test], runtime: false},
       {:lazy_html, "0.1.8", only: :test},
