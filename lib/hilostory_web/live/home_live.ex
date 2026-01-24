@@ -40,11 +40,11 @@ defmodule HilostoryWeb.HomeLive do
       <label for="timezone-picker">Timezone</label>
       <select id="timezone-picker" name="timezone">
         <option
-            :for={timezone <- TzExtra.time_zone_ids()}
-            value={timezone}
-            selected={(@time_zone == nil and @default_timezone == timezone) or @time_zone == timezone }
+          :for={timezone <- TzExtra.time_zone_ids()}
+          value={timezone}
+          selected={(@time_zone == nil and @default_timezone == timezone) or @time_zone == timezone}
         >
-            {timezone}
+          {timezone}
         </option>
       </select>
       <label for="period-type-input">Period</label>
@@ -136,6 +136,10 @@ defmodule HilostoryWeb.HomeLive do
 
   def handle_event("period-changed", params, socket) do
     {:noreply, assign(socket, pending_custom_period?: params["period-type"] == "custom")}
+  end
+
+  def handle_event("set-default-timezone", %{"time-zone" => "Etc/Unknown"}, socket) do
+    {:noreply, socket}
   end
 
   def handle_event("set-default-timezone", params, socket) do
