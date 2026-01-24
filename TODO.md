@@ -1,4 +1,3 @@
-- Discard "Etc/Unknown" as a default timezone
 - Don't hardcode location id in websocket supervisor
 - aller chercher les devices via l'api REST
 - protéger l'interface web avec un mot de passe
