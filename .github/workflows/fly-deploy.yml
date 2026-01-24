@@ -63,6 +63,7 @@ jobs:
       - name: Check if changes require a deployment
         run: |
           deployable_paths='
+          .github/workflows/fly-deploy.yml
           assets/css
           assets/scripts
           assets/ts
