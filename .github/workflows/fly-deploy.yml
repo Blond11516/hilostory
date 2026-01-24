@@ -1,6 +1,7 @@
 # See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
 
 name: Fly Deploy
+
 on:
   push:
     branches:
@@ -27,8 +28,6 @@ jobs:
       HILO_TOKENS_ENCRYPTION_KEY: PvCTwQJp9ka2eW7GvlWLdhLUtlh0ZpfUiwrCUxQdZGI=
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - uses: actions/cache@v5
         id: deps-cache
@@ -51,15 +50,68 @@ jobs:
       - run: mix deps.compile
       - run: mix compile
       - run: mix test
-  deploy:
-    name: Deploy app
+
+  check-if-deploy:
+    name: Check if deployment required
     runs-on: ubuntu-latest
-    concurrency: deploy-group # optional: ensure only one action runs at a time
     needs: test
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+
+      - name: Check if changes require a deployment
+        run: |
+          deployable_paths='
+          assets/css
+          assets/scripts
+          assets/ts
+          assets/bun.lock
+          assets/package.json
+          config/config.exs
+          config/prod.exs
+          config/runtime.exs
+          lib
+          priv
+          rel
+          Dockerfile
+          fly.toml
+          mix.exs
+          mix.lock
+          '
+
+          # Joining the deployable paths into a grep-compatible regex pattern
+          joined_paths=$(echo "$deployable_paths" |
+              sed '/^[[:space:]]*$/d' | # Trim empty lines
+              sed 's/\./\\\./g' |        # Escape dots globally
+              tr '\n' '|' |               # Join patterns with pipes
+              sed 's/|$//'                 # Remove trailing pipe
+          )
+
+          # Get the list of changed files
+          diff=$(git diff --name-only HEAD~1 HEAD)
+
+          # Check for matches with grep directly
+          grep_regex="^($joined_paths)"
+          if echo "$diff" | grep -qE $grep_regex; then
+            echo "Will require a deployment because the following files changed:"
+            echo "$diff" | grep -E $grep_regex
+
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changed files require a deployment"
+
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    concurrency: deploy-group # optional: ensure only one action runs at a time
+    needs: check-if-deploy
+    if: needs.check-if-deploy.outputs.should-deploy == 'true'
+    steps:
+      - uses: actions/checkout@v6
       - uses: superfly/flyctl-actions/setup-flyctl@v1
       - uses: getsentry/action-release@v3
         env:
