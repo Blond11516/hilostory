@@ -59,12 +59,14 @@ defmodule Hilostory.MixProject do
       {:websockex, "0.5.1"},
       {:zoi, "0.17.0"},
       {:live_debugger, "0.5.1", only: [:dev]},
+      {:mix_test_interactive, "5.1.0", only: :dev, runtime: false},
       {:phoenix_live_reload, "1.6.2", only: :dev},
       {:igniter, "0.7.2", only: :dev},
       {:styler, "1.10.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "1.4.7", only: [:dev, :test], runtime: false},
       {:lazy_html, "0.1.8", only: :test},
-      {:patch, "0.16.0", only: [:dev, :test]}
+      {:patch, "0.16.0", only: [:dev, :test]},
+      {:test_server, "0.1.21", only: :test, github: "mhanberg/test_server", ref: "plug-one-nineteen"}
     ]
   end
 
